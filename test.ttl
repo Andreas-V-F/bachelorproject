@@ -1,0 +1,16 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix person: <http://www.w3.org/ns/person#> .
+@prefix dbr: <http://dpedia.org/resource/> .
+@prefix dbo: <http://dpedia.org/ontology/> .
+
+dbr:Test_Person_1
+    a foaf:Person ;
+    rdfs:label "Label" ;
+    rdfs:seeAlso dbr:Rastafari ;
+    dbo:birthPlace dbr:Jamaica .
+
+
+
