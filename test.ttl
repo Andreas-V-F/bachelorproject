@@ -5,11 +5,13 @@
 @prefix person: <http://www.w3.org/ns/person#> .
 @prefix dbr: <http://dpedia.org/resource/> .
 @prefix dbo: <http://dpedia.org/ontology/> .
+@prefix hjem: <http://google.com/> .
 
 dbr:Test_Person_1
     a foaf:Person ;
+    hjem:name "Navn" ;
     rdfs:label "Label" ;
-    rdfs:seeAlso dbr:Rastafari ;
+    rdfs:seeAlso "gamer" ;
     dbo:birthPlace dbr:Jamaica .
 
 
