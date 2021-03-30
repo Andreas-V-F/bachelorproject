@@ -3,7 +3,20 @@
 //TODO: UNBOUND VARIABLE
 //TODO: LITERAL PREDICATE
 //TODO: PREFIXES
+class Triple {
+    subject = ""
+    predicate = ""
+    object = ""
 
+    constructor(subject, predicate, object) {
+        this.subject = subject
+        this.predicate = predicate
+        this.object = object
+    }
+    toString(){
+        return "Subject: " + this.subject + ", predicate: " + this.predicate + " and object: " + this.object
+    }
+}
 
 
 class SPARQL {
@@ -12,13 +25,14 @@ class SPARQL {
     boundVariables = []
     unboundVariables = []
     literals = []
-    prefixes = []
+    prefixes = [[],[]]
 
 
-    constructor(triples, type, boundVariables) {
+    constructor(triples, type, boundVariables, prefixes) {
         this.triples = triples
         this.type = type
         this.boundVariables = boundVariables
+        this.prefixes = prefixes
         this.setRest()
     }
 
@@ -27,7 +41,6 @@ class SPARQL {
             for (const [key, value] of Object.entries(triples[i])){
                 this.setUnboundVariables(key, value)
                 this.setLiterals(value)
-                this.setPrefixes(value)
             }
 
         }
@@ -45,18 +58,16 @@ class SPARQL {
         }
     }
 
-    setPrefixes(value) {
-        if (value.includes(":") && !this.prefixes.includes(value.split(":")[0] + ":")) {
-            this.prefixes.push(value.split(":")[0] + ":")
-        }
-
-    }
-
 }
 
 let triples = [new Triple("?x", "foaf:name", "?name"), new Triple("?x", "foaf:mbox", "?mbox")]
 let boundVariables = ["?name", "?mbox"]
+let prefixes = [["foaf","url"]]
+console.log(prefixes[0][0])
+console.log(prefixes[0][1])
 let type = "SELECT"
 let sparqltest = new SPARQL(triples, type, boundVariables)
 
-document.write("Prefixes: " + sparqltest.prefixes + "\nLiterals: " + sparqltest.literals + "\nUnboundvariables: " + sparqltest.unboundVariables)
+
+
+//document.write("Prefixes: " + sparqltest.prefixes + "\nLiterals: " + sparqltest.literals + "\nUnboundvariables: " + sparqltest.unboundVariables)
