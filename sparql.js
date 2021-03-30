@@ -53,7 +53,3 @@ console.log(prefixes[0][0])
 console.log(prefixes[0][1])
 let type = "SELECT"
 let sparqltest = new SPARQL(triples, type, boundVariables)
-
-
-
-//document.write("Prefixes: " + sparqltest.prefixes + "\nLiterals: " + sparqltest.literals + "\nUnboundvariables: " + sparqltest.unboundVariables)
