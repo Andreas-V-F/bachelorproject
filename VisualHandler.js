@@ -32,8 +32,9 @@ class VisualHandler {
         this.styleSheet.insertRule("svg { background-color: #F3F0F0; display: block; margin: auto } ", this.styleSheet.cssRules.length);
     }
 
-    nodeCreation() {
+    nodeCreation(text) {
         var size = 25;
+        
         var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute("cx", ""+ this.posX +"");
         circle.setAttribute("cy", ""+ this.posY +"");
@@ -41,6 +42,15 @@ class VisualHandler {
         circle.setAttribute("stroke", "green")
         circle.setAttribute("fill", "blue");
         this.svgElement.appendChild(circle);
+
+        var name = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        name.setAttribute("x", ""+ this.posX +"");
+        name.setAttribute("y", ""+ this.posY +"");
+        name.setAttribute('fill', 'white');
+        name.setAttribute("text-anchor", "middle");
+        name.textContent = text;
+        this.svgElement.appendChild(name);
+
     }
 
     onRightClick(){
@@ -53,7 +63,7 @@ class VisualHandler {
                 this.posX = point.x;
                 this.posY = point.y;
                 console.log("Point x = " + this.posX + ", Point y = " + this.posY);
-                this.nodeCreation();
+                this.nodeCreation("ryge");
             }
         })
     }
