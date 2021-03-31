@@ -7,10 +7,17 @@ var tools = [];
 var posX;
 var posY;
 var currentTool = 0;
+var popUp;
 
 window.addEventListener('load', (event) => {
     initiate();
 });
+
+window.onclick = function (event) {
+    if (event.target == popUp) {
+        popUp.style.display = "none";
+    }
+}
 
 function initiate() {
     styleRules();
@@ -20,7 +27,11 @@ function initiate() {
 
     initCanvas(div);
 
+    createPopUp();
+
     onClick();
+    
+    setTool(currentTool);
 }
 
 function styleRules() {
@@ -28,9 +39,15 @@ function styleRules() {
     document.head.appendChild(styleElement);
     styleSheet = styleElement.sheet;
     styleSheet.insertRule("svg { background-color: #F3F0F0; display: block; margin: auto } ", styleSheet.cssRules.length);
-    styleSheet.insertRule("img { border: 1px solid #ddd; border-radius: 4px; -ms-user-select: none; -moz-user-select: none; -webkit-user-select: none; user-select: none;} ", styleSheet.cssRules.length);
+    styleSheet.insertRule("img { border: 1px solid #ddd; border-radius: 4px; -ms-user-select: none; -moz-user-select: none; -webkit-user-select: none; user-select: none} ", styleSheet.cssRules.length);
     styleSheet.insertRule("div { text-align:center } ", styleSheet.cssRules.length);
     styleSheet.insertRule(".image { display: inline-block } ", styleSheet.cssRules.length);
+    styleSheet.insertRule(".svgtext { -ms-user-select: none; -moz-user-select: none; -webkit-user-select: none; user-select: none } ", styleSheet.cssRules.length);
+    styleSheet.insertRule(".form { display: none; position: fixed; z-index: 1; padding-top: 100px; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0); background-color: rgba(0,0,0,0.4) } ", styleSheet.cssRules.length);
+    styleSheet.insertRule(".formcontent { background-color: #fefefe; margin: auto; padding: 20px; border: 1px solid #888; width: 20% } ", styleSheet.cssRules.length);
+    styleSheet.insertRule(".close { color: #aaaaaa; float: right; font-size: 28px; font-weight: bold; -ms-user-select: none; -moz-user-select: none; -webkit-user-select: none; user-select: none} ", styleSheet.cssRules.length);
+    styleSheet.insertRule(".close:hover,.close:focus { color: #000; text-decoration: none; cursor: pointer} ", styleSheet.cssRules.length);
+    styleSheet.insertRule(".selectedImage { border: 2px solid blue; } ", styleSheet.cssRules.length);
 }
 
 function initCanvas(div) {
@@ -52,7 +69,7 @@ function initTools(toolbar) {
     img.src = "./resources/toolbarpics/mouse_pointer.png";
     img.setAttribute("title", "Edit");
     let t = new tool(img, tools.length);
-    t.toDo = function(){
+    t.toDo = function () {
         console.log("idiot");
     }
     tools.push(t);
@@ -61,21 +78,53 @@ function initTools(toolbar) {
     img.src = "./resources/toolbarpics/circle.png";
     img.setAttribute("title", "Add node");
     t = new tool(img, tools.length);
-    t.toDo = function(){
-        console.log("fuck af");
+    t.toDo = function () {
+        popUp.style.display = "block";
+        if (text != null) {
+            if (text[0] != "?") {
+                text = "?" + text;
+            }
+            nodeCreation(text);
+        }
     }
     tools.push(t);
 
-    for(let i = 0; i<tools.length; i++){
+    for (let i = 0; i < tools.length; i++) {
         let image = tools[i].img;
         let div = document.createElement("div");
         div.setAttribute("class", "image");
         image.setAttribute("width", "50");
         image.setAttribute("height", "50");
-        image.setAttribute("onclick", "setTool("+i+")");
+        image.setAttribute("onclick", "setTool(" + i + ")");
         div.appendChild(image);
         toolbar.appendChild(div);
     }
+
+}
+
+function createPopUp() {
+    let div = document.createElement("div");
+    div.setAttribute("class", "form");
+
+    let innerDiv = document.createElement("div");
+    innerDiv.setAttribute("class", "formcontent");
+
+    let close = document.createElement("span");
+    close.setAttribute("class", "close");
+    close.textContent = "×"
+    close.onclick = function () {
+        popUp.style.display = "none";
+    }
+
+    let p = document.createElement("p");
+    p.textContent = "duh bruh!";
+
+    innerDiv.appendChild(close);
+    innerDiv.appendChild(p);
+    div.appendChild(innerDiv);
+    document.body.append(div);
+
+    popUp = div;
 
 }
 
@@ -95,6 +144,7 @@ function nodeCreation(text) {
     name.setAttribute("y", "" + posY + "");
     name.setAttribute('fill', 'white');
     name.setAttribute("text-anchor", "middle");
+    name.setAttribute("class", "svgtext");
     name.textContent = text;
     svgElement.appendChild(name);
 
@@ -115,5 +165,7 @@ function onClick() {
 }
 
 function setTool(toolID) {
+    tools[currentTool].img.removeAttribute("class")
     currentTool = toolID;
+    tools[currentTool].img.setAttribute("class", "selectedImage")
 }
