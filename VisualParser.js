@@ -1,1 +1,0 @@
-vs = new VisualHandler(1000,1000);
