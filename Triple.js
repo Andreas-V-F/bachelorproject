@@ -1,7 +1,7 @@
 export default class Triple {
-    subject;
-    predicate;
-    object;
+    subject = ""
+    predicate = ""
+    object = ""
 
     constructor(subject, predicate, object) {
         this.subject = subject

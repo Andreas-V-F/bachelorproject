@@ -1,53 +1,49 @@
+import {updateTextarea} from "./TextualHandler.js";
+import SPARQL from "./sparql.js";
+import Triple from "./Triple.js";
+import {parseToVisual} from "./VisualParser.js"
+
 let parsePrefixes = [[],[]]
 let parseTriples = []
 let parseType = ""
 let parseBoundVariables = []
-let parseUnboundVariables = []
-let parseLiterals = []
-/*
 let indexOf = (arr, q) => arr.findIndex(item => q.toLowerCase() === item.toLowerCase());
 
 
-function parse(){
+export function parse(){
+    console.log("test")
     let s = document.getElementById("parse").value;
     let t = s.split(" ").join("\n").split("\n")
     t = arrayRemove(t, "")
     if(t[0].toLowerCase() === "prefix"){
-        parseWithPrefix(t)
+        t = arrayRemove(t, "PREFIX")
+        for(let i = 0; i < indexOf(t, "select"); i++){
+            parsePrefixes[i][0] = t.shift()
+            parsePrefixes[i][1] = t.shift().replace("<", "").replace(">", "")
+        }
     }
-    else {
-        parseWithoutPrefix(t)
+    parseType = t.shift().toUpperCase()
+    let indexWhere = indexOf(t, "where")
+    for(let i = 0; i < indexWhere; i++){
+        parseBoundVariables[i] = t.shift()
     }
-}
-export function ibsenxd() {
-    console.log("gamer")
-}
-function parseWithPrefix(t)
-{
-    console.log(t)
-    console.log((indexOf(t, "select")-1)/2)
-    for(let i = 1; i < indexOf(t, "select"); i += 2){
-        console.log(i)
-        parsePrefixes[(i-1)/2][0] = t[i]
-        parsePrefixes[(i-1)/2][1] = t[i+1].replace("<", "").replace(">", "")
+    console.log(parseBoundVariables)
+    t = t.slice(2)
+    t = arrayRemove(t, ".")
+    let indexOfRightB = indexOf(t, "}")
+    for(let i = 0; i < indexOfRightB; i+=3){
+        parseTriples[i/3] = new Triple(t.shift(), t.shift(), t.shift())
     }
-    parsePrefixes.forEach((element) => {
-        element.forEach((data) => {
-            console.log(data)
-        })
-    })
-}
-
-function parseWithoutPrefix(t){
+    parseToVisual(new SPARQL(parseTriples, parseType, parseBoundVariables, parsePrefixes))
 
 }
 
 function arrayRemove(arr, value){
     return arr.filter(function (ele){
-        return ele !== value
+        return ele.toLowerCase() !== value.toLowerCase()
     })
 }
-*/
+
 
 export function returnToText(sparql){
     let outputText = ""
@@ -64,5 +60,5 @@ export function returnToText(sparql){
     }
     outputText += "}"
 
-    document.write("parse").value = outputText
+    updateTextarea(outputText)
 }
