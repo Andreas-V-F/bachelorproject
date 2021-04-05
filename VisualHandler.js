@@ -242,7 +242,7 @@ export function setTool(toolID) {
     tools[currentTool].img.removeAttribute("class")
     currentTool = toolID;
     tools[currentTool].img.setAttribute("class", "selectedImage")
-
+    updateTextualView();
 }
 
 export function appendParsedElements(parsedNodes, parsedArrows) {
@@ -298,5 +298,5 @@ function updateArrows(node, ar) {
 }
 
 function updateTextualView(){
-    parseToSPARQL(nodes,arrows,type);
+    parseToSPARQL(arrows,type);
 }

@@ -3,7 +3,7 @@ export default class Arrow{
     nodeOne;
     nodeTwo;
     text;
-    prefix;
+    prefix = "";
     //id;
 
     constructor(nodeOne, nodeTwo, text){
@@ -19,5 +19,9 @@ export default class Arrow{
         path.setAttribute("stroke","black");
         path.setAttribute("stroke-width","3");
         return path;
+    }
+
+    assignPrefix(prefix){
+        this.prefix = prefix;
     }
 }
