@@ -5,5 +5,6 @@ window.setTool = setTool;
 init();
 
 function init(){
+
     initiateVisualHandler();
 }

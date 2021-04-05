@@ -1,6 +1,7 @@
 import { appendParsedElements } from './VisualHandler.js';
 import Node from './Node.js';
 import Arrow from './Arrow.js';
+import { returnToText} from "./TextParser";
 
 export function parseToVisual(spq) {
 
@@ -46,6 +47,7 @@ function getNode(nodeArray, variable) {
 
 export function parseToSPARQL(nodes, arrows) {
 
+    returnToText()
 }
 
 /*export function testMethod() {
