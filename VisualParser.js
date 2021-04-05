@@ -40,7 +40,7 @@ function getNode(nodeArray, variable){
     }
 }
 
-var counter = 0;
+/*var counter = 0;
 
 window.onclick = function (event) {
     counter++;
@@ -54,4 +54,4 @@ window.onclick = function (event) {
         bool = true;
     }
 
-}
+}*/

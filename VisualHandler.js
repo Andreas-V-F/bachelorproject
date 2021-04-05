@@ -70,7 +70,7 @@ function initTools(toolbar) {
     img.src = "./resources/toolbarpics/mouse_pointer.png";
     img.setAttribute("title", "Edit");
     let t = new Tool(img, tools.length);
-    t.toDo = function () {
+    t.toDo = function (evt) {
         console.log("Edit tool");
     }
     tools.push(t);
@@ -187,7 +187,7 @@ function nodeCreationUI(text, isBounded) {
 
 function nodeCreation(node) {
 
-    //rewrite so node positions are random, not hitting other objects
+    //rewrite so node positions are random, not hitting other objects. or maybe follows some sort of tree structure?
 
     let radius = 50;
     node.posX = Math.floor(Math.random() * width);
@@ -230,7 +230,7 @@ function onClick() {
             point = point.matrixTransform(svgElement.getScreenCTM().inverse());
             posX = point.x;
             posY = point.y;
-            tools[currentTool].toDo();
+            tools[currentTool].toDo(event);
         }
     })
 }
