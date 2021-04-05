@@ -1,6 +1,7 @@
 import Arrow from './Arrow.js';
 import Tool from './Tool.js';
 import Node from './Node.js';
+import { parseToSPARQL } from './VisualParser.js';
 
 var width = 1000;
 var height = 900;
@@ -13,6 +14,7 @@ var posX;
 var posY;
 var currentTool = 0;
 var popUp;
+var type = "SELECT";
 
 window.onclick = function (event) {
     if (event.target == popUp) {
@@ -293,4 +295,8 @@ function updateArrows(node, ar) {
         }
     }
 
+}
+
+function updateTextualView(){
+    parseToSPARQL(nodes,arrows,type);
 }

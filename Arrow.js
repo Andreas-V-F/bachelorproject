@@ -3,6 +3,7 @@ export default class Arrow{
     nodeOne;
     nodeTwo;
     text;
+    prefix;
     //id;
 
     constructor(nodeOne, nodeTwo, text){

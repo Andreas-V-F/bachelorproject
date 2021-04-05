@@ -2,6 +2,7 @@ import { appendParsedElements } from './VisualHandler.js';
 import Node from './Node.js';
 import Arrow from './Arrow.js';
 import { returnToText} from "./TextParser";
+import SPARQL from './sparql.js';
 
 export function parseToVisual(spq) {
 
@@ -45,9 +46,12 @@ function getNode(nodeArray, variable) {
     }
 }
 
-export function parseToSPARQL(nodes, arrows) {
-
-    returnToText()
+export function parseToSPARQL(nodes, arrows, type) {
+    let triples = "";
+    let boundVariables = "";
+    let prefixes = "";
+    let spql = new SPARQL(triples, type, boundVariables, prefixes);
+    returnToText(spql);
 }
 
 /*export function testMethod() {
