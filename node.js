@@ -14,21 +14,5 @@ class Node{
         this.posY = posY;
     }
 
-    get posX(){
-        return this.posX;
-    }
-
-    get posY(){
-        return this.posY;
-    }
-
-    get variableName(){
-        return this.variableName;
-    }
-
-    get isBounded(){
-        return this.isBounded;
-    }
-
 
 }

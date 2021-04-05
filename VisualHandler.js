@@ -218,8 +218,6 @@ function arrowCreationUI(nodeOne, nodeTwo, text) {
 }
 
 function arrowCreation(arrow) {
-    console.log(arrow);
-    console.log(arrow.drawArrow());
     svgElement.appendChild(arrow.drawArrow());
 }
 
@@ -244,11 +242,13 @@ function setTool(toolID) {
 }
 
 function appendParsedElements(parsedNodes, parsedArrows) {
-    //check if existing nodes are still there. Avoid them moving around. TODO: UPDATE NEW ARROWS TO USE EXISTING OBJECTS!
     for (let i = 0; i < parsedNodes.length; i++) {
-        if (!nodeExists(parsedNodes[i])) {
+        let node = nodeExists(parsedNodes[i]);
+        if (node == null) {
             nodeCreation(parsedNodes[i]);
             nodes.push(parsedNodes[i]);
+        } else {
+            updateArrows(node, parsedArrows);
         }
     }
 
@@ -264,20 +264,31 @@ function appendParsedElements(parsedNodes, parsedArrows) {
 function nodeExists(node) {
     for (let i = 0; i < nodes.length; i++) {
         if (node.variableName == nodes[i].variableName) {
+            return nodes[i];
+        }
+    }
+    return null;
+}
+
+function arrowExists(arrow) {
+    for (let i = 0; i < arrows.length; i++) {
+        if (arrow.nodeOne.variableName != arrows[i].nodeOne.variableName) {
+            continue;
+        } else if (arrow.nodeTwo.variableName == arrows[i].nodeTwo.variableName) {
             return true;
         }
     }
     return false;
 }
 
-function arrowExists(arrow) {
-    for (let i = 0; i < arrows.length; i++) {
-        if (arrow.nodeNames[0] != arrows[i].nodeNames[0]) {
-            console.log(arrow);
-            continue;
-        } else if (arrow.nodeNames[1] == arrows[i].nodeNames[1]) {
-            return true;
+function updateArrows(node, ar) {
+    for (let i = 0; i < ar.length; i++) {
+        if (node.variableName == ar[i].nodeOne.variableName) {
+            ar[i].nodeOne = node;
+        } else if(node.variableName == ar[i].nodeTwo.variableName)
+        {
+            ar[i].nodeTwo = node;
         }
     }
-    return false;
+
 }

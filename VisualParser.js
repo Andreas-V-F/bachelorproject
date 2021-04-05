@@ -40,10 +40,11 @@ function getNode(nodeArray, variable){
     }
 }
 
-/*var bool = false;
+var counter = 0;
 
 window.onclick = function (event) {
-    if (bool == false) {
+    counter++;
+    if (counter == 8) {
         let tripleArray = [new Triple("?x", "foaf:name", "?name"), new Triple("?x", "foaf:mbox", "?mbox")]
         let boundVariablesArray = ["?name", "?mbox"]
         let prefixesArray = [["foaf", "url"]]
@@ -53,4 +54,4 @@ window.onclick = function (event) {
         bool = true;
     }
 
-}*/
+}

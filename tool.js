@@ -8,10 +8,6 @@ class Tool{
         this.id = id;
     }
 
-    get img(){
-        return this.img;
-    }
-
     toDo(){
         console.log("not overwritten");
     }
