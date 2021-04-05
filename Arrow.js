@@ -1,4 +1,4 @@
-class Arrow{
+export default class Arrow{
 
     nodeOne;
     nodeTwo;

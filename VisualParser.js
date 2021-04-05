@@ -1,7 +1,11 @@
-function parse(SPARQL) {
+import { appendParsedElements } from './VisualHandler.js';
+import Node from './Node.js';
+import Arrow from './Arrow.js';
 
-    let nArray = nodeArray(SPARQL.triples, SPARQL.unboundVariables);
-    let aArray = arrowArray(nArray, SPARQL.triples);
+export function parseToVisual(spq) {
+
+    let nArray = nodeArray(spq.triples, spq.unboundVariables);
+    let aArray = arrowArray(nArray, spq.triples);
 
     appendParsedElements(nArray, aArray);
 }
@@ -32,26 +36,23 @@ function isBoundedVariable(variable, unboundVariables) {
     return true;
 }
 
-function getNode(nodeArray, variable){
+function getNode(nodeArray, variable) {
     for (let i = 0; i < nodeArray.length; i++) {
-        if(nodeArray[i].variableName == variable){
+        if (nodeArray[i].variableName == variable) {
             return nodeArray[i];
         }
     }
 }
 
-/*var counter = 0;
+export function parseToSPARQL(nodes, arrows) {
 
-window.onclick = function (event) {
-    counter++;
-    if (counter == 8) {
-        let tripleArray = [new Triple("?x", "foaf:name", "?name"), new Triple("?x", "foaf:mbox", "?mbox")]
-        let boundVariablesArray = ["?name", "?mbox"]
-        let prefixesArray = [["foaf", "url"]]
-        let typeText = "SELECT"
-        let sparqltest2 = new SPARQL(tripleArray, typeText, boundVariablesArray, prefixesArray)
-        parse(sparqltest2);
-        bool = true;
-    }
+}
 
+/*export function testMethod() {
+    let tripleArray = [new Triple("?x", "foaf:name", "?name"), new Triple("?x", "foaf:mbox", "?mbox")]
+    let boundVariablesArray = ["?name", "?mbox"]
+    let prefixesArray = [["foaf", "url"]]
+    let typeText = "SELECT"
+    let sparqltest2 = new SPARQL(tripleArray, typeText, boundVariablesArray, prefixesArray)
+    parseToVisual(sparqltest2);
 }*/

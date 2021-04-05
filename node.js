@@ -1,4 +1,4 @@
-class Node{
+export default class Node{
 
     variableName;
     isBounded;

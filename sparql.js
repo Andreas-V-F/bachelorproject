@@ -5,13 +5,13 @@
 //TODO: PREFIXES
 
 
-class SPARQL {
+export default class SPARQL {
     triples = []
     type = ""
     boundVariables = []
     unboundVariables = []
     literals = []
-    prefixes = [[],[]]
+    prefixes = [[], []]
 
 
     constructor(triples, type, boundVariables, prefixes) {
@@ -24,7 +24,7 @@ class SPARQL {
 
     setRest() {
         for (let i = 0; i < this.triples.length; i++) {
-            for (const [key, value] of Object.entries(triples[i])){
+            for (const [key, value] of Object.entries(this.triples[i])) {
                 this.setUnboundVariables(key, value)
                 this.setLiterals(value)
             }
@@ -44,36 +44,12 @@ class SPARQL {
         }
     }
 
-    get triples(){
-        return this.triples;
-    }
-
-    get type(){
-        return this.type;
-    }
-
-    get boundVariables(){
-        return this.boundVariables;
-    }
-
-    get unboundVariables(){
-        return this.unboundVariables;
-    }
-
-    get literals(){
-        return this.literals;
-    }
-
-    get prefixes(){
-        return this.prefixes;
-    }
-
 }
 
-let triples = [new Triple("?x", "foaf:name", "?name"), new Triple("?x", "foaf:mbox", "?mbox")]
+/*let triples = [new Triple("?x", "foaf:name", "?name"), new Triple("?x", "foaf:mbox", "?mbox")]
 let boundVariables = ["?name", "?mbox"]
 let prefixes = [["foaf","url"]]
 //console.log(prefixes[0][0])
 //console.log(prefixes[0][1])
 let type = "SELECT"
-let sparqltest = new SPARQL(triples, type, boundVariables)
+let sparqltest = new SPARQL(triples, type, boundVariables)*/

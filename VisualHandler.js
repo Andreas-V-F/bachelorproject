@@ -1,3 +1,7 @@
+import Arrow from './Arrow.js';
+import Tool from './Tool.js';
+import Node from './Node.js';
+
 var width = 1000;
 var height = 900;
 var styleSheet;
@@ -10,17 +14,14 @@ var posY;
 var currentTool = 0;
 var popUp;
 
-window.addEventListener('load', () => {
-    initiate();
-});
-
 window.onclick = function (event) {
     if (event.target == popUp) {
         popUp.style.display = "none";
     }
 }
 
-function initiate() {
+export function initiate() {
+
     styleRules();
 
     let div = document.createElement("div");
@@ -59,7 +60,7 @@ function initCanvas(div) {
     let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("height", "" + height + "");
     svg.setAttribute("width", "" + width + "");
-    svg.setAttribute("viewBox", "0 0 " + width + "" + height + "");
+    svg.setAttribute("viewBox", "0 0 " + width + " " + height + "");
     svg.setAttribute("id", "svgCanvas");
     div.appendChild(svg);
     svgElement = svg;
@@ -212,7 +213,7 @@ function nodeCreation(node) {
 }
 
 function arrowCreationUI(nodeOne, nodeTwo, text) {
-    arrow = new Arrow(nodeOne, nodeTwo, text);
+    let arrow = new Arrow(nodeOne, nodeTwo, text);
     svgElement.appendChild(arrow.drawArrow());
     arrows.push(arrow);
 }
@@ -235,13 +236,14 @@ function onClick() {
     })
 }
 
-function setTool(toolID) {
+export function setTool(toolID) {
     tools[currentTool].img.removeAttribute("class")
     currentTool = toolID;
     tools[currentTool].img.setAttribute("class", "selectedImage")
+
 }
 
-function appendParsedElements(parsedNodes, parsedArrows) {
+export function appendParsedElements(parsedNodes, parsedArrows) {
     for (let i = 0; i < parsedNodes.length; i++) {
         let node = nodeExists(parsedNodes[i]);
         if (node == null) {

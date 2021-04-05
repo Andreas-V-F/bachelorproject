@@ -1,4 +1,4 @@
-class Tool{
+export default class Tool{
 
     img;
     id;
