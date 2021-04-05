@@ -1,9 +1,11 @@
-import { initiate as initiateVisualHandler, setTool} from './VisualHandler.js';
+//import { initiate as initiateVisualHandler, setTool} from './VisualHandler.js';
+import {initiateTextualHandler} from "./TextualHandler.js";
 //import { testMethod } from './VisualParser.js';
-window.setTool = setTool;
+//window.setTool = setTool;
 
 init();
 
 function init(){
-    initiateVisualHandler();
+    initiateTextualHandler();
+    //initiateVisualHandler();
 }

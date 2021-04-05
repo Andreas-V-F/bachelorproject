@@ -5,7 +5,7 @@
 //TODO: PREFIXES
 
 
-class SPARQL {
+export default class SPARQL {
     triples = []
     type = ""
     boundVariables = []
@@ -52,9 +52,4 @@ class SPARQL {
     }
 
 }
-
-let triples = [new Triple("?x", "foaf:name", "?name"), new Triple("?x", "foaf:mbox", "?mbox")]
-let boundVariables = ["?name", "?mbox"]
-let type = "SELECT"
-let sparqltest = new SPARQL(triples, type, boundVariables)
 

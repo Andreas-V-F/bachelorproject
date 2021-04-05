@@ -1,4 +1,4 @@
-class Triple {
+export default class Triple {
     subject = ""
     predicate = ""
     object = ""

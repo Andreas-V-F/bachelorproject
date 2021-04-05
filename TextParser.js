@@ -1,3 +1,8 @@
+import {updateTextarea} from "./TextualHandler.js";
+import SPARQL from "./sparql.js";
+import Triple from "./Triple.js";
+import {parseToVisual} from "./VisualParser.js"
+
 let parsePrefixes = [[],[]]
 let parseTriples = []
 let parseType = ""
@@ -5,7 +10,8 @@ let parseBoundVariables = []
 let indexOf = (arr, q) => arr.findIndex(item => q.toLowerCase() === item.toLowerCase());
 
 
-function parse(){
+export function parse(){
+    console.log("test")
     let s = document.getElementById("parse").value;
     let t = s.split(" ").join("\n").split("\n")
     t = arrayRemove(t, "")
@@ -28,7 +34,7 @@ function parse(){
     for(let i = 0; i < indexOfRightB; i+=3){
         parseTriples[i/3] = new Triple(t.shift(), t.shift(), t.shift())
     }
-    return new SPARQL(parseTriples, parseType, parseBoundVariables, parsePrefixes)
+    parseToVisual(new SPARQL(parseTriples, parseType, parseBoundVariables, parsePrefixes))
 
 }
 
@@ -39,7 +45,7 @@ function arrayRemove(arr, value){
 }
 
 
-function returnToText(sparql){
+export function returnToText(sparql){
     let outputText = ""
     for(let i = 0; i < sparql.prefixes.length; i++){
         outputText += "PREFIX " + sparql.prefixes[i][0] + " " + "<" + sparql.prefixes[i][1] + ">\n"
@@ -54,5 +60,5 @@ function returnToText(sparql){
     }
     outputText += "}"
 
-    document.getElementById("parse").value = outputText
+    updateTextarea(outputText)
 }
