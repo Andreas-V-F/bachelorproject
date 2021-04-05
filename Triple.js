@@ -11,5 +11,17 @@ class Triple {
     toString(){
         return "Subject: " + this.subject + ", predicate: " + this.predicate + " and object: " + this.object
     }
+
+    get subject(){
+        this.subject;
+    }
+
+    get predicate(){
+        this.predicate;
+    }
+    
+    get object(){
+        this.object;
+    }
 }
 

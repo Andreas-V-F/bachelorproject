@@ -1,4 +1,4 @@
-class tool{
+class Tool{
 
     img;
     id;
