@@ -5,7 +5,6 @@
 //TODO: PREFIXES
 
 
-
 class SPARQL {
     triples = []
     type = ""
@@ -59,4 +58,3 @@ let boundVariables = ["?name", "?mbox"]
 let type = "SELECT"
 let sparqltest = new SPARQL(triples, type, boundVariables)
 
-//document.write("Prefixes: " + sparqltest.prefixes + "\nLiterals: " + sparqltest.literals + "\nUnboundvariables: " + sparqltest.unboundVariables)
