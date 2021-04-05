@@ -79,12 +79,3 @@ export function parseToSPARQL(arrows, type) {
     console.log(spql);
     returnToText(spql);
 }
-
-/*export function testMethod() {
-    let tripleArray = [new Triple("?x", "foaf:name", "?name"), new Triple("?x", "foaf:mbox", "?mbox")]
-    let boundVariablesArray = ["?name", "?mbox"]
-    let prefixesArray = [["foaf", "url"]]
-    let typeText = "SELECT"
-    let sparqltest2 = new SPARQL(tripleArray, typeText, boundVariablesArray, prefixesArray)
-    parseToVisual(sparqltest2);
-}*/
