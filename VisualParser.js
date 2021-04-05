@@ -1,8 +1,9 @@
 import { appendParsedElements } from './VisualHandler.js';
 import Node from './Node.js';
 import Arrow from './Arrow.js';
-import { returnToText} from "./TextParser";
+import { returnToText} from "./TextParser.js";
 import SPARQL from './sparql.js';
+import Triple from './Triple.js';
 
 export function parseToVisual(spq) {
 
@@ -15,7 +16,7 @@ export function parseToVisual(spq) {
 function arrowArray(nArray, triples) {
     let arrows = [];
     for (let i = 0; i < triples.length; i++) {
-        arrows.push(new Arrow(getNode(nArray, triples[i].subject), getNode(nArray, triples[i].object), getNode(nArray, triples[i].predicate)));
+        arrows.push(new Arrow(getNode(nArray, triples[i].subject), getNode(nArray, triples[i].object), triples[i].predicate));
     }
     return arrows;
 }
@@ -46,11 +47,36 @@ function getNode(nodeArray, variable) {
     }
 }
 
-export function parseToSPARQL(nodes, arrows, type) {
-    let triples = "";
-    let boundVariables = "";
-    let prefixes = "";
+export function parseToSPARQL(arrows, type) {
+
+    // can there be nodes without arrows? if so, these are missing.
+
+    let triples = [];
+    let boundVariables = [];
+    let prefixes = [[]];
+
+    for(let i = 0; i<arrows.length; i++){
+        triples.push(new Triple(arrows[i].nodeOne.variableName, arrows[i].text, arrows[i].nodeTwo.variableName));
+        if(arrows[i].nodeOne.isBounded){
+            if(!boundVariables.includes(arrows[i].nodeOne.variableName)){
+                boundVariables.push(arrows[i].nodeOne.variableName);
+            }
+        } 
+        if(arrows[i].nodeTwo.isBounded){
+            if(!boundVariables.includes(arrows[i].nodeTwo.variableName)){
+                boundVariables.push(arrows[i].nodeTwo.variableName);
+            }
+        }
+        if(arrows[i].prefix != ""){
+            let array = arrows[i].prefix.split(":");
+            if(!prefixes.includes(array[0])){
+                prefixes.push(array);
+            }
+        }
+    }
+
     let spql = new SPARQL(triples, type, boundVariables, prefixes);
+    console.log(spql);
     returnToText(spql);
 }
 
