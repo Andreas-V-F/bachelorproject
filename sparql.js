@@ -23,7 +23,7 @@ export default class SPARQL {
 
     setRest() {
         for (let i = 0; i < this.triples.length; i++) {
-            for (const [key, value] of Object.entries(triples[i])){
+            for (const [key, value] of Object.entries(this.triples[i])){
                 this.setUnboundVariables(key, value)
                 this.setLiterals(value)
                 this.setPrefixes(value)

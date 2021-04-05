@@ -11,7 +11,6 @@ let indexOf = (arr, q) => arr.findIndex(item => q.toLowerCase() === item.toLower
 
 
 export function parse(){
-    console.log("test")
     let s = document.getElementById("parse").value;
     let t = s.split(" ").join("\n").split("\n")
     t = arrayRemove(t, "")
@@ -27,7 +26,6 @@ export function parse(){
     for(let i = 0; i < indexWhere; i++){
         parseBoundVariables[i] = t.shift()
     }
-    console.log(parseBoundVariables)
     t = t.slice(2)
     t = arrayRemove(t, ".")
     let indexOfRightB = indexOf(t, "}")
@@ -56,7 +54,7 @@ export function returnToText(sparql){
     }
     outputText += "\nWHERE {\n"
     for(let i = 0; i < sparql.triples.length; i++){
-        outputText += sparql.triples[i].subject + " " + sparql.triples[i].predicate + " " + sparql.triples[i].object + "\n"
+        outputText += "   " + sparql.triples[i].subject + " " + sparql.triples[i].predicate + " " + sparql.triples[i].object + "\n"
     }
     outputText += "}"
 

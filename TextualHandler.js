@@ -6,6 +6,7 @@ export function initiateTextualHandler(){
     let parseText = document.createElement("textarea")
     parseText.setAttribute("id", "parse")
     let parseButton = document.createElement("button")
+    parseButton.textContent = "Parse"
     parseButton.onclick = function(){
         parse()
     }
