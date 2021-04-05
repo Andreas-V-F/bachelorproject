@@ -24,7 +24,9 @@ class Arrow{
     get nodeNames(){
         let nodeNames = [];
         nodeNames.push(this.nodeOne.variableName);
+        
         nodeNames.push(this.nodeTwo.variableName);
-    }
 
+        return nodeNames;
+    }
 }

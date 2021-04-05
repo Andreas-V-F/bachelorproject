@@ -1,11 +1,15 @@
 function parse(SPARQL) {
-    appendParsedElements(nodeArray(SPARQL.triples, SPARQL.unboundVariables), arrowArray(triples));
+
+    let nArray = nodeArray(SPARQL.triples, SPARQL.unboundVariables);
+    let aArray = arrowArray(nArray, SPARQL.triples);
+
+    appendParsedElements(nArray, aArray);
 }
 
-function arrowArray(triples) {
+function arrowArray(nArray, triples) {
     let arrows = [];
     for (let i = 0; i < triples.length; i++) {
-        arrows.push(new Arrow(triple[i].subject, triple[i].object, triple[i].predicate));
+        arrows.push(new Arrow(getNode(nArray, triples[i].subject), getNode(nArray, triples[i].object), getNode(nArray, triples[i].predicate)));
     }
     return arrows;
 }
@@ -28,6 +32,25 @@ function isBoundedVariable(variable, unboundVariables) {
     return true;
 }
 
-function testMethod(){
-    console.log("zzz");
+function getNode(nodeArray, variable){
+    for (let i = 0; i < nodeArray.length; i++) {
+        if(nodeArray[i].variableName == variable){
+            return nodeArray[i];
+        }
+    }
 }
+
+/*var bool = false;
+
+window.onclick = function (event) {
+    if (bool == false) {
+        let tripleArray = [new Triple("?x", "foaf:name", "?name"), new Triple("?x", "foaf:mbox", "?mbox")]
+        let boundVariablesArray = ["?name", "?mbox"]
+        let prefixesArray = [["foaf", "url"]]
+        let typeText = "SELECT"
+        let sparqltest2 = new SPARQL(tripleArray, typeText, boundVariablesArray, prefixesArray)
+        parse(sparqltest2);
+        bool = true;
+    }
+
+}*/

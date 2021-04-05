@@ -173,7 +173,7 @@ function nodeCreationUI(text, isBounded) {
     circle.setAttribute("fill", "blue");
     svgElement.appendChild(circle);
 
-    var name = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    let name = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     name.setAttribute("x", "" + posX + "");
     name.setAttribute("y", "" + posY + "");
     name.setAttribute('fill', 'white');
@@ -190,6 +190,8 @@ function nodeCreation(node) {
     //rewrite so node positions are random, not hitting other objects
 
     let radius = 50;
+    node.posX = Math.floor(Math.random() * width);
+    node.posY = Math.floor(Math.random() * height);
 
     let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute("cx", "" + node.posX + "");
@@ -199,7 +201,7 @@ function nodeCreation(node) {
     circle.setAttribute("fill", "blue");
     svgElement.appendChild(circle);
 
-    var name = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    let name = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     name.setAttribute("x", "" + node.posX + "");
     name.setAttribute("y", "" + node.posY + "");
     name.setAttribute('fill', 'white');
@@ -209,13 +211,15 @@ function nodeCreation(node) {
 
 }
 
-function arrowCreationUI(nodeOne, nodeTwo, text){
+function arrowCreationUI(nodeOne, nodeTwo, text) {
     arrow = new Arrow(nodeOne, nodeTwo, text);
     svgElement.appendChild(arrow.drawArrow());
     arrows.push(arrow);
 }
 
-function arrowCreation(arrow){
+function arrowCreation(arrow) {
+    console.log(arrow);
+    console.log(arrow.drawArrow());
     svgElement.appendChild(arrow.drawArrow());
 }
 
@@ -240,43 +244,40 @@ function setTool(toolID) {
 }
 
 function appendParsedElements(parsedNodes, parsedArrows) {
-    //check if existing nodes are still there. Avoid them moving around.
-    for(let i = 0; i<parsedNodes.length; i++){
-        if(!nodeExists(parsedNodes[i])){
+    //check if existing nodes are still there. Avoid them moving around. TODO: UPDATE NEW ARROWS TO USE EXISTING OBJECTS!
+    for (let i = 0; i < parsedNodes.length; i++) {
+        if (!nodeExists(parsedNodes[i])) {
             nodeCreation(parsedNodes[i]);
             nodes.push(parsedNodes[i]);
         }
     }
 
-    for(let i = 0; i<parsedArrows.length; i++){
-        if(!arrowExists(parsedArrows[i])){
+    for (let i = 0; i < parsedArrows.length; i++) {
+        if (!arrowExists(parsedArrows[i])) {
             arrowCreation(parsedArrows[i]);
             arrows.push(parsedArrows[i]);
         }
     }
 
-
-
 }
 
-function nodeExists(node){
-    for(let i = 0; i<nodes.length; i++){
-        if(node.variableName == nodes[i].variableName){
+function nodeExists(node) {
+    for (let i = 0; i < nodes.length; i++) {
+        if (node.variableName == nodes[i].variableName) {
             return true;
         }
     }
     return false;
 }
 
-function arrowExists(arrow){
-    for(let i = 0; i<arrows.length; i++){
-        if(arrow.nodeNames[0] != arrows.nodeNames[0]){
+function arrowExists(arrow) {
+    for (let i = 0; i < arrows.length; i++) {
+        if (arrow.nodeNames[0] != arrows[i].nodeNames[0]) {
+            console.log(arrow);
             continue;
-        } else if(arrow.nodeNames[1] == arrows.nodeNames[1]){
+        } else if (arrow.nodeNames[1] == arrows[i].nodeNames[1]) {
             return true;
         }
     }
     return false;
 }
-
-parser.testMethod();
