@@ -56,7 +56,7 @@ export function parseToSPARQL(arrows, type) {
     let prefixes = [[]];
 
     for(let i = 0; i<arrows.length; i++){
-        triples.push(new Triple(arrows[i].nodeOne.variableName, arrows[i].text, arrows[i].nodeTwo.variableName));
+        triples.push(new Triple(arrows[i].nodeOne.variableName, arrows[i].predicate, arrows[i].nodeTwo.variableName));
         if(arrows[i].nodeOne.isBounded){
             if(!boundVariables.includes(arrows[i].nodeOne.variableName)){
                 boundVariables.push(arrows[i].nodeOne.variableName);

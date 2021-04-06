@@ -1,27 +1,39 @@
-export default class Arrow{
+export default class Arrow {
 
     nodeOne;
     nodeTwo;
-    text;
+    predicate;
     prefix = "";
     //id;
 
-    constructor(nodeOne, nodeTwo, text){
+    constructor(nodeOne, nodeTwo, predicate) {
         this.nodeOne = nodeOne;
         this.nodeTwo = nodeTwo;
-        this.text = text;
+        this.predicate = predicate;
     }
 
-    drawArrow(){
-        //should return an array of SVGs instead of just path
+    drawArrow() {
+
+        let svg = [];
+
         let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute("d","M " + this.nodeOne.posX + " " + this.nodeOne.posY + " L " + this.nodeTwo.posX + " " + this.nodeTwo.posY);
-        path.setAttribute("stroke","black");
-        path.setAttribute("stroke-width","3");
-        return path;
+        path.setAttribute("d", "M " + this.nodeOne.posX + " " + this.nodeOne.posY + " L " + this.nodeTwo.posX + " " + this.nodeTwo.posY);
+        path.setAttribute("stroke", "black");
+        path.setAttribute("stroke-width", "3");
+        svg.push(path);
+
+        let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute("x", "" + (this.nodeOne.posX+this.nodeTwo.posX)/2 + "");
+        text.setAttribute("y", "" + (this.nodeOne.posY+this.nodeTwo.posY)/2 + "");
+        text.setAttribute('fill', 'red');
+        text.setAttribute("text-anchor", "middle");
+        text.textContent = this.predicate;
+        svg.push(text);
+
+        return svg;
     }
 
-    assignPrefix(prefix){
+    assignPrefix(prefix) {
         this.prefix = prefix;
     }
 }

@@ -166,6 +166,11 @@ function nodeCreationUI(text, isBounded) {
         text = "?" + text;
     }
 
+    if(nodeExists(new Node(text, "", "", ""))){
+        alert("Variable already exists")
+        return;
+    }
+
     let radius = 50;
 
     let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -216,12 +221,18 @@ function nodeCreation(node) {
 
 function arrowCreationUI(nodeOne, nodeTwo, text) {
     let arrow = new Arrow(nodeOne, nodeTwo, text);
-    svgElement.appendChild(arrow.drawArrow());
+    for(let i = 0; i<arrow.drawArrow().length; i++){
+        let element = arrow.drawArrow()[i];
+        svgElement.appendChild(element);
+    }
     arrows.push(arrow);
 }
 
 function arrowCreation(arrow) {
-    svgElement.appendChild(arrow.drawArrow());
+    for(let i = 0; i<arrow.drawArrow().length; i++){
+        let element = arrow.drawArrow()[i];
+        svgElement.appendChild(element);
+    }
 }
 
 function onClick() {
