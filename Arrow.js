@@ -3,7 +3,6 @@ export default class Arrow {
     nodeOne;
     nodeTwo;
     predicate;
-    prefix = "";
     //id;
 
     constructor(nodeOne, nodeTwo, predicate) {
@@ -31,9 +30,5 @@ export default class Arrow {
         svg.push(text);
 
         return svg;
-    }
-
-    assignPrefix(prefix) {
-        this.prefix = prefix;
     }
 }

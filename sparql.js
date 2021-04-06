@@ -11,13 +11,14 @@ export default class SPARQL {
     boundVariables = []
     unboundVariables = []
     literals = []
-    prefixes = []
+    prefixes = [[]]
 
 
-    constructor(triples, type, boundVariables) {
+    constructor(triples, type, boundVariables,prefixes) {
         this.triples = triples
         this.type = type
         this.boundVariables = boundVariables
+        this.prefixes = prefixes;
         this.setRest()
     }
 
@@ -26,7 +27,6 @@ export default class SPARQL {
             for (const [key, value] of Object.entries(this.triples[i])){
                 this.setUnboundVariables(key, value)
                 this.setLiterals(value)
-                this.setPrefixes(value)
             }
 
         }
@@ -42,13 +42,6 @@ export default class SPARQL {
         if (value.includes("\"") && !this.literals.includes(value)) {
             this.literals.push(value)
         }
-    }
-
-    setPrefixes(value) {
-        if (value.includes(":") && !this.prefixes.includes(value.split(":")[0] + ":")) {
-            this.prefixes.push(value.split(":")[0] + ":")
-        }
-
     }
 
 }

@@ -15,6 +15,7 @@ var posY;
 var currentTool = 0;
 var popUp;
 var type = "SELECT";
+var prefixes = [[]];
 
 window.onclick = function (event) {
     if (event.target == popUp) {
@@ -84,6 +85,8 @@ function initTools(toolbar) {
     t = new Tool(img, tools.length);
     t.toDo = function () {
         popUp.style.display = "block";
+        document.getElementById("arrowDiv").style.display = "none";
+        document.getElementById("nodeDiv").style.display = "block";
     }
     tools.push(t);
 
@@ -92,8 +95,13 @@ function initTools(toolbar) {
     img.setAttribute("title", "Connect nodes");
     t = new Tool(img, tools.length);
     t.toDo = function () {
-        console.log("arrow tool");
-        arrowCreationUI(nodes[0], nodes[1], "arrow!!!");
+
+
+
+        //popUp.style.display = "block";
+        //document.getElementById("nodeDiv").style.display = "none";
+        //document.getElementById("arrowDiv").style.display = "block";
+        //arrowCreationUI(nodes[0], nodes[1], "arrow!!!");
     }
     tools.push(t);
 
@@ -124,12 +132,30 @@ function createPopUp() {
         popUp.style.display = "none";
     }
 
+    innerDiv.appendChild(close);
+    
+    let nodePop = nodePopUp();
+    innerDiv.appendChild(nodePop);
+
+    let arrowPop = arrowPopUp();
+    innerDiv.appendChild(arrowPop);
+
+    div.appendChild(innerDiv);
+
+    document.body.append(div);
+
+    popUp = div;
+
+}
+
+function nodePopUp(){
     let formDiv = document.createElement("div");
     let input = document.createElement("input");
     let p = document.createElement("p");
     let checkbox = document.createElement("input");
     let button = document.createElement("button");
 
+    formDiv.setAttribute("id","nodeDiv");
     input.setAttribute("type", "text");
     input.setAttribute("value", "variable name");
     p.textContent = "Bounded: ";
@@ -148,25 +174,31 @@ function createPopUp() {
     formDiv.appendChild(checkbox);
     formDiv.appendChild(document.createElement("br"));
     formDiv.appendChild(button);
+    return formDiv;
+}
 
-    innerDiv.appendChild(close);
-    innerDiv.appendChild(formDiv);
+function arrowPopUp(){
+    let arrowDiv = document.createElement("div");
+    let input = document.createElement("input");
+    let p = document.createElement("p");
 
-    div.appendChild(innerDiv);
 
-    document.body.append(div);
+    arrowDiv.setAttribute("id","arrowDiv");
+    p.textContent = "Bounded: ";
 
-    popUp = div;
-
+    arrowDiv.appendChild(p);
+    return arrowDiv;
 }
 
 function nodeCreationUI(text, isBounded) {
 
-    if (text[0] != "?") {
+    let svg = [];
+
+    if (text[0] != "?" && !text.includes(":")) {
         text = "?" + text;
     }
 
-    if(nodeExists(new Node(text, "", "", ""))){
+    if(nodeExists(new Node(text, "", "", ""), nodes)){
         alert("Variable already exists")
         return;
     }
@@ -180,6 +212,7 @@ function nodeCreationUI(text, isBounded) {
     circle.setAttribute("stroke", "green")
     circle.setAttribute("fill", "blue");
     svgElement.appendChild(circle);
+    svg.push(circle);
 
     let name = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     name.setAttribute("x", "" + posX + "");
@@ -188,14 +221,20 @@ function nodeCreationUI(text, isBounded) {
     name.setAttribute("text-anchor", "middle");
     name.textContent = text;
     svgElement.appendChild(name);
+    svg.push(name);
 
-    nodes.push(new Node(text, isBounded, posX, posY));
+    let node = new Node(text, isBounded, posX, posY);
+    nodes.push(node);
+
+    node.svg = svg;
 
 }
 
 function nodeCreation(node) {
 
     //rewrite so node positions are random, not hitting other objects. or maybe follows some sort of tree structure?
+
+    let svg = [];
 
     let radius = 50;
     node.posX = Math.floor(Math.random() * width);
@@ -208,6 +247,7 @@ function nodeCreation(node) {
     circle.setAttribute("stroke", "green")
     circle.setAttribute("fill", "blue");
     svgElement.appendChild(circle);
+    svg.push(circle)
 
     let name = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     name.setAttribute("x", "" + node.posX + "");
@@ -216,6 +256,9 @@ function nodeCreation(node) {
     name.setAttribute("text-anchor", "middle");
     name.textContent = node.variableName;
     svgElement.appendChild(name);
+    svg.push(name);
+    
+    node.svg = svg;
 
 }
 
@@ -229,6 +272,7 @@ function arrowCreationUI(nodeOne, nodeTwo, text) {
 }
 
 function arrowCreation(arrow) {
+    console.log(arrow);
     for(let i = 0; i<arrow.drawArrow().length; i++){
         let element = arrow.drawArrow()[i];
         svgElement.appendChild(element);
@@ -256,7 +300,11 @@ export function setTool(toolID) {
     updateTextualView();
 }
 
-export function appendParsedElements(parsedNodes, parsedArrows) {
+export function appendParsedElements(parsedNodes, parsedArrows, ty, pref) {
+    //REMINDER: doesnt check if already existing node has changed properties other than name
+    prefixes = pref;
+    type = ty;
+
     for (let i = 0; i < parsedNodes.length; i++) {
         let node = nodeExists(parsedNodes[i]);
         if (node == null) {
@@ -276,10 +324,10 @@ export function appendParsedElements(parsedNodes, parsedArrows) {
 
 }
 
-function nodeExists(node) {
-    for (let i = 0; i < nodes.length; i++) {
-        if (node.variableName == nodes[i].variableName) {
-            return nodes[i];
+function nodeExists(node, nodeArray) {
+    for (let i = 0; i < nodeArray.length; i++) {
+        if (node.variableName == nodeArray[i].variableName) {
+            return nodeArray[i];
         }
     }
     return null;
@@ -308,6 +356,18 @@ function updateArrows(node, ar) {
 
 }
 
+function drawNodes(){
+    for(let i = 0; i<nodes.length; i++){
+        nodeCreation(nodes[i]);
+    }
+}
+
+function drawArrows(){
+    for(let i = 0; i<arrows.length; i++){
+        arrowCreation(arrows[i]);
+    }
+}
+
 function updateTextualView(){
-    parseToSPARQL(arrows,type);
+    parseToSPARQL(arrows,type, prefixes);
 }

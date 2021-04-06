@@ -8,9 +8,9 @@ import Triple from './Triple.js';
 export function parseToVisual(spq) {
 
     let nArray = nodeArray(spq.triples, spq.unboundVariables);
-    let aArray = arrowArray(nArray, spq.triples);
+    let aArray = arrowArray(nArray, spq.triples, spq.prefixes);
 
-    appendParsedElements(nArray, aArray);
+    appendParsedElements(nArray, aArray, spq.type, spq.prefixes);
 }
 
 function arrowArray(nArray, triples) {
@@ -47,13 +47,12 @@ function getNode(nodeArray, variable) {
     }
 }
 
-export function parseToSPARQL(arrows, type) {
+export function parseToSPARQL(arrows, type, prefixes) {
 
     // can there be nodes without arrows? if so, these are missing.
 
     let triples = [];
     let boundVariables = [];
-    let prefixes = [[]];
 
     for(let i = 0; i<arrows.length; i++){
         triples.push(new Triple(arrows[i].nodeOne.variableName, arrows[i].predicate, arrows[i].nodeTwo.variableName));
@@ -65,12 +64,6 @@ export function parseToSPARQL(arrows, type) {
         if(arrows[i].nodeTwo.isBounded){
             if(!boundVariables.includes(arrows[i].nodeTwo.variableName)){
                 boundVariables.push(arrows[i].nodeTwo.variableName);
-            }
-        }
-        if(arrows[i].prefix != ""){
-            let array = arrows[i].prefix.split(":");
-            if(!prefixes.includes(array[0])){
-                prefixes.push(array);
             }
         }
     }

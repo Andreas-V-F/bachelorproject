@@ -4,6 +4,7 @@ export default class Node{
     isBounded;
     posX;
     posY;
+    svg = [];
     //color;
     //id;
 
@@ -14,5 +15,6 @@ export default class Node{
         this.posY = posY;
     }
 
+    
 
 }
