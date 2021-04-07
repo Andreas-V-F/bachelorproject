@@ -272,7 +272,6 @@ function arrowCreationUI(nodeOne, nodeTwo, text) {
 }
 
 function arrowCreation(arrow) {
-    console.log(arrow);
     for(let i = 0; i<arrow.drawArrow().length; i++){
         let element = arrow.drawArrow()[i];
         svgElement.appendChild(element);
@@ -306,13 +305,27 @@ export function appendParsedElements(parsedNodes, parsedArrows, ty, pref) {
     type = ty;
 
     for (let i = 0; i < parsedNodes.length; i++) {
-        let node = nodeExists(parsedNodes[i]);
+        let node = nodeExists(parsedNodes[i],nodes);
         if (node == null) {
             nodeCreation(parsedNodes[i]);
             nodes.push(parsedNodes[i]);
         } else {
             updateArrows(node, parsedArrows);
         }
+    }
+
+    let tempArray = [];
+
+    for (let i = 0; i < nodes.length; i++) {
+        if(nodeExists(nodes[i], parsedNodes) == null){
+            tempArray.push(nodes[i]);
+            nodes.splice(i,1);
+            i--;
+        }
+    }
+
+    for(let i = 0; i<tempArray.length; i++){
+        deleteNode(tempArray[i]);
     }
 
     for (let i = 0; i < parsedArrows.length; i++) {
@@ -331,6 +344,12 @@ function nodeExists(node, nodeArray) {
         }
     }
     return null;
+}
+
+function deleteNode(node){
+    for(let i = 0; i<node.svg.length; i++){
+        svgElement.removeChild(node.svg[i]);
+    }
 }
 
 function arrowExists(arrow) {
