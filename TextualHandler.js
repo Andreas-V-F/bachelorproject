@@ -5,6 +5,7 @@ export function initiateTextualHandler(){
     document.body.append(div)
     let parseText = document.createElement("textarea")
     parseText.setAttribute("id", "parse")
+    parseText.textContent = "SELECT\nWHERE {\n}"
     let parseButton = document.createElement("button")
     parseButton.textContent = "Parse"
     parseButton.onclick = function(){

@@ -3,7 +3,7 @@ import SPARQL from "./sparql.js";
 import Triple from "./Triple.js";
 import {parseToVisual} from "./VisualParser.js"
 
-let parsePrefixes = [[],[]]
+let parsePrefixes = [[]]
 let parseTriples = []
 let parseType = ""
 let parseBoundVariables = []
