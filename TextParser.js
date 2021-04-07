@@ -14,6 +14,9 @@ export function parse(){
     let s = document.getElementById("parse").value;
     let t = s.split(" ").join("\n").split("\n")
     t = arrayRemove(t, "")
+    t = t.map(function (el) {
+        return el.trim();
+    });
     if(t[0].toLowerCase() === "prefix"){
         t = arrayRemove(t, "PREFIX")
         for(let i = 0; i < indexOf(t, "select"); i++){
