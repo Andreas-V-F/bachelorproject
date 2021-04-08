@@ -11,7 +11,7 @@ export default class SPARQL {
     boundVariables = []
     unboundVariables = []
     literals = []
-    prefixes = [[]]
+    prefixes = []
 
 
     constructor(triples, type, boundVariables,prefixes) {

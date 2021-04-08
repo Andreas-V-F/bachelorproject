@@ -7,6 +7,8 @@ import Triple from './Triple.js';
 
 export function parseToVisual(spq) {
 
+    console.log(spq);
+
     let nArray = nodeArray(spq.triples, spq.unboundVariables);
     let aArray = arrowArray(nArray, spq.triples, spq.prefixes);
 
