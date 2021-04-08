@@ -21,5 +21,5 @@ export function initiateTextualHandler(){
     div.append(parseButton)
 }
 export function updateTextarea(updatedText){
-    document.getElementById("parse").textContent = updatedText
+    document.getElementById("parse").value = updatedText
 }

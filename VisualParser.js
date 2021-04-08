@@ -7,8 +7,6 @@ import Triple from './Triple.js';
 
 export function parseToVisual(spq) {
 
-    console.log(spq);
-
     let nArray = nodeArray(spq.triples, spq.unboundVariables);
     let aArray = arrowArray(nArray, spq.triples, spq.prefixes);
 
@@ -51,8 +49,6 @@ function getNode(nodeArray, variable) {
 
 export function parseToSPARQL(arrows, type, prefixes) {
 
-    // can there be nodes without arrows? if so, these are missing.
-
     let triples = [];
     let boundVariables = [];
 
@@ -71,6 +67,5 @@ export function parseToSPARQL(arrows, type, prefixes) {
     }
 
     let spql = new SPARQL(triples, type, boundVariables, prefixes);
-    console.log(spql);
     returnToText(spql);
 }
