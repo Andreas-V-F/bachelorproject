@@ -2,6 +2,9 @@ import {parse} from "./TextParser.js";
 
 export function initiateTextualHandler(){
     let div = document.createElement("div")
+    div.style.float = "left"
+    div.style.marginLeft = "200px"
+    div.style.marginTop = "100px"
     document.body.append(div)
     let parseText = document.createElement("textarea")
     parseText.setAttribute("id", "parse")
@@ -18,6 +21,7 @@ export function initiateTextualHandler(){
         parse()
     }
     div.append(parseText)
+    div.append(document.createElement("br"))
     div.append(parseButton)
 }
 export function updateTextarea(updatedText){

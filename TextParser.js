@@ -57,7 +57,7 @@ export function returnToText(sparql) {
     }
     outputText += "\nWHERE {\n"
     for (let i = 0; i < sparql.triples.length; i++) {
-        outputText += "   " + sparql.triples[i].subject + " " + sparql.triples[i].predicate + " " + sparql.triples[i].object + ".\n"
+        outputText += "   " + sparql.triples[i].subject + " " + sparql.triples[i].predicate + " " + sparql.triples[i].object + " .\n"
     }
     outputText += "}"
 
