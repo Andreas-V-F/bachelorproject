@@ -1,5 +1,3 @@
-import {nodeClicked} from "./VisualHandler.js";
-
 export default class Node {
 
     variableName;
@@ -8,13 +6,14 @@ export default class Node {
     posY;
     svg = [];
     //color;
-    //id;
+    id;
 
     constructor(variableName, isBounded, posX, posY) {
         this.variableName = variableName;
         this.isBounded = isBounded;
         this.posX = posX;
         this.posY = posY;
+        this.id = Date.now();
     }
 
     drawNode() {
@@ -22,19 +21,16 @@ export default class Node {
         let radius = "6%";
 
         let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute("id","" + this.variableName);
+        circle.setAttribute("id","nodeCircle:"+this.id);
         circle.setAttribute("cx", "" + this.posX + "");
         circle.setAttribute("cy", "" + this.posY + "");
         circle.setAttribute("r", "" + radius + "");
         circle.setAttribute("stroke", "green")
         circle.setAttribute("fill", "blue");
-        circle.onclick = function (){
-            nodeClicked(circle);
-        }
         this.svg.push(circle)
 
         let name = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        name.setAttribute("id","circleText");
+        name.setAttribute("id","nodeText:"+this.id);
         name.setAttribute("x", "" + this.posX + "");
         name.setAttribute("y", "" + this.posY + "");
         name.setAttribute('fill', 'white');

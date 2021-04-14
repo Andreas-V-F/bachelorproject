@@ -15,7 +15,8 @@ var posY;
 var currentTool = 0;
 var type = "SELECT";
 var prefixes = [];
-var selected = [];
+var selectedNodes = [];
+var selectedArrows = [];
 
 window.onclick = function (event) {
     let popUp = document.getElementById("popUp");
@@ -35,7 +36,7 @@ export function initiate() {
 
     createPopUp();
 
-    onClick();
+    initEventListeners();
 
     setTool(currentTool);
 }
@@ -53,8 +54,10 @@ function styleRules() {
     styleSheet.insertRule(".close { color: #aaaaaa; float: right; font-size: 28px; font-weight: bold;} ", styleSheet.cssRules.length);
     styleSheet.insertRule(".close:hover,.close:focus { color: #000; text-decoration: none; cursor: pointer} ", styleSheet.cssRules.length);
     styleSheet.insertRule(".selectedImage { border: 2px solid blue; } ", styleSheet.cssRules.length);
-    styleSheet.insertRule("#circleText { pointer-events: none; } ", styleSheet.cssRules.length);
-    styleSheet.insertRule(".selectedNode { stroke: white; fill: grey} ", styleSheet.cssRules.length);
+    styleSheet.insertRule("#nodeText { pointer-events: none; } ", styleSheet.cssRules.length);
+    styleSheet.insertRule("#arrowText { pointer-events: none; } ", styleSheet.cssRules.length);
+    styleSheet.insertRule(".selectedNode{ stroke: red; fill: grey} ", styleSheet.cssRules.length);
+    styleSheet.insertRule(".selectedArrow{ stroke: red;} ", styleSheet.cssRules.length);
 }
 
 function initCanvas(div) {
@@ -78,8 +81,28 @@ function initTools(toolbar) {
     let name = "Edit";
     img.setAttribute("title", "" + name);
     let t = new Tool(img, name, tools.length);
-    t.toDo = function (evt) {
-        console.log("Edit tool");
+    t.toDo = function (event) {
+        let element = document.elementFromPoint(event.clientX, event.clientY);
+        let str = element.id.split(":");
+        if (event.button == 0) {
+            if (element.id.includes("node")) {
+                let node = getNodeByID(str[1]);
+                if (selectedNodes.includes(node)) {
+                    deselectNode(node);
+                    return;
+                }
+                selectNode(str[1]);
+                return;
+            }
+            if (element.id.includes("arrow")) {
+                let arrow = getArrowByID(str[1]);
+                if (selectedArrows.includes(arrow)) {
+                    deselectArrow(arrow);
+                    return;
+                }
+                selectArrow(str[1]);
+            }
+        }
     }
     tools.push(t);
 
@@ -88,10 +111,12 @@ function initTools(toolbar) {
     name = "Add node";
     img.setAttribute("title", "" + name);
     t = new Tool(img, name, tools.length);
-    t.toDo = function () {
-        document.getElementById("popUp").style.display = "block";
-        document.getElementById("arrowDiv").style.display = "none";
-        document.getElementById("nodeDiv").style.display = "block";
+    t.toDo = function (event) {
+        if (event.button == 0) {
+            document.getElementById("popUp").style.display = "block";
+            document.getElementById("arrowDiv").style.display = "none";
+            document.getElementById("nodeDiv").style.display = "block";
+        }
     }
     tools.push(t);
 
@@ -100,17 +125,32 @@ function initTools(toolbar) {
     name = "Connect nodes";
     img.setAttribute("title", "" + name);
     t = new Tool(img, name, tools.length);
-    t.toDo = function () {
-    }
-    tools.push(t);
+    t.toDo = function (event) {
+        if (event.button == 0) {
+            let element = document.elementFromPoint(event.clientX, event.clientY);
+            if (!element.id.includes("node")) {
+                return;
+            }
 
-    img = document.createElement("img");
-    img.src = "./resources/toolbarpics/tempParseButton.png";
-    name = "Parse";
-    img.setAttribute("title", "" + name);
-    t = new Tool(img, name, tools.length);
-    t.toDo = function () {
-        updateTextualView();
+            let str = element.id.split(":");
+            let node = getNodeByID(str[1]);
+            if (selectedNodes.includes(node)) {
+                deselectNode(node);
+                return;
+            }
+
+            if (selectedNodes.length < 2) {
+                selectNode(str[1]);
+            }
+
+            if (selectedNodes.length == 2) {
+                document.getElementById("popUp").style.display = "block";
+                document.getElementById("nodeDiv").style.display = "none";
+                document.getElementById("arrowDiv").style.display = "block";
+            }
+
+        }
+
     }
     tools.push(t);
 
@@ -196,7 +236,7 @@ function arrowPopUp() {
     button.textContent = "Submit";
     button.onclick = function () {
         document.getElementById("popUp").style.display = "none";
-        arrowCreationUI(nodeExists(new Node(selected[0].id,"","",""),nodes), nodeExists(new Node(selected[1].id,"","",""),nodes), input.value);
+        arrowCreationUI(selectedNodes[0], selectedNodes[1], input.value);
         deselectNodes();
         input.value = "";
     }
@@ -213,6 +253,11 @@ function arrowPopUp() {
 
 function nodeCreationUI(text, isBounded) {
 
+    if (text == "") {
+        alert("Input a variablename");
+        return;
+    }
+
     let node = new Node(text, isBounded, posX, posY);
 
     if (text[0] != "?" && !text.includes(":")) {
@@ -220,7 +265,7 @@ function nodeCreationUI(text, isBounded) {
     }
 
     if (nodeExists(node, nodes)) {
-        alert("Variable already exists")
+        alert("Variable already exists");
         return;
     }
 
@@ -249,11 +294,12 @@ function nodeCreation(node) {
 
 function arrowCreationUI(nodeOne, nodeTwo, text) {
     let arrow = new Arrow(nodeOne, nodeTwo, text);
-    if(arrowExists(arrow)){
+    if (arrowExists(arrow)) {
         return;
     }
     arrowCreation(arrow);
     arrows.push(arrow);
+    updateTextualView();
 }
 
 function arrowCreation(arrow) {
@@ -264,18 +310,50 @@ function arrowCreation(arrow) {
     }
 }
 
-function onClick() {
+function initEventListeners() {
     svgElement.addEventListener('mousedown', (event) => {
-        if (event.button == 0) {
-            let point = svgElement.createSVGPoint();
-            point.x = event.clientX;
-            point.y = event.clientY;
-            point = point.matrixTransform(svgElement.getScreenCTM().inverse());
-            posX = point.x;
-            posY = point.y;
-            tools[currentTool].toDo(event);
+        let point = svgElement.createSVGPoint();
+        point.x = event.clientX;
+        point.y = event.clientY;
+        point = point.matrixTransform(svgElement.getScreenCTM().inverse());
+        posX = point.x;
+        posY = point.y;
+        tools[currentTool].toDo(event);
+    })
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key == 'Delete') {
+            for (let i = 0; i < selectedNodes.length; i++) {
+                for (let x = 0; x < nodes.length; x++) {
+                    if (selectedNodes[i].id == nodes[x].id) {
+                        let arrowArray = getArrowsFromNode(nodes[x]);
+                        for(let y = 0; y<arrowArray.length; y++){
+                            deleteArrow(arrowArray[y])
+                            arrows.splice(arrows.indexOf(arrowArray[y]),1)
+                        }
+                        deleteNode(nodes[x]);
+                        nodes.splice(x, 1);
+                        break;
+                    }
+                }
+            }
+            for (let i = 0; i < selectedArrows.length; i++) {
+                for (let x = 0; x < arrows.length; x++) {
+                    if (selectedArrows[i].id == arrows[x].id) {
+                        deleteArrow(arrows[x]);
+                        arrows.splice(x, 1);
+                        break;
+                    }
+                }
+            }
+            console.log(arrows)
+            console.log(nodes)
+            selectedNodes = [];
+            selectedArrows = [];
+            updateTextualView();
         }
     })
+
 }
 
 export function setTool(toolID) {
@@ -283,6 +361,7 @@ export function setTool(toolID) {
     currentTool = toolID;
     tools[currentTool].img.setAttribute("class", "selectedImage")
     deselectNodes();
+    deselectArrows();
 }
 
 export function appendParsedElements(parsedNodes, parsedArrows, ty, pref) {
@@ -314,7 +393,7 @@ export function appendParsedElements(parsedNodes, parsedArrows, ty, pref) {
         deleteNode(tempArray[i]);
     }
 
-    for(let i = 0; i < arrows.length; i++){
+    for (let i = 0; i < arrows.length; i++) {
         deleteArrow(arrows[i]);
     }
     arrows = [];
@@ -337,13 +416,25 @@ function nodeExists(node, nodeArray) {
     return null;
 }
 
+function getArrowsFromNode(node){
+    let arrowArray = [];
+    
+    for(let i = 0; i < arrows.length; i++){
+        if(arrows[i].nodeOne.variableName == node.variableName || arrows[i].nodeTwo.variableName == node.variableName){
+            arrowArray.push(arrows[i])
+        }
+    }
+
+    return arrowArray;
+}
+
 function deleteNode(node) {
     for (let i = 0; i < node.svg.length; i++) {
         svgElement.removeChild(node.svg[i]);
     }
 }
 
-function deleteArrow(arrow){
+function deleteArrow(arrow) {
     for (let i = 0; i < arrow.svg.length; i++) {
         svgElement.removeChild(arrow.svg[i]);
     }
@@ -375,39 +466,64 @@ function updateTextualView() {
     parseToSPARQL(arrows, type, prefixes);
 }
 
-export function nodeClicked(circle) {
-    if (currentTool == 1 || currentTool == 3) {
-        return;
-    }
-
-    if (currentTool == 2) {
-        if (selected.includes(circle)) {
-            deselectNode(circle);
-            return;
-        }
-        if (selected.length < 2) {
-            circle.setAttribute("class", "selectedNode");
-            circle.setAttribute("r", "6.5%")
-            selected.push(circle);
-        }
-        if (selected.length == 2) {
-            document.getElementById("popUp").style.display = "block";
-            document.getElementById("nodeDiv").style.display = "none";
-            document.getElementById("arrowDiv").style.display = "block";
-        }
-    }
-
+function selectNode(id) {
+    let node = getNodeByID(id);
+    let circle = svgElement.getElementById("nodeCircle:" + id);
+    circle.setAttribute("class", "selectedNode");
+    circle.setAttribute("r", "6.5%");
+    selectedNodes.push(node);
 }
 
+
 function deselectNodes() {
-    for (let i = 0; i < selected.length; i++) {
-        deselectNode(selected[i]);
+    for (let i = 0; i < selectedNodes.length; i++) {
+        deselectNode(selectedNodes[i]);
         i--;
     }
 }
 
-function deselectNode(circle) {
+function deselectNode(node) {
+    let circle = svgElement.getElementById("nodeCircle:" + node.id);
     circle.removeAttribute("class");
     circle.setAttribute("r", "6%")
-    selected.splice(selected.indexOf(circle), 1);
+    selectedNodes.splice(selectedNodes.indexOf(node), 1);
+}
+
+function selectArrow(id) {
+    let arrow = getArrowByID(id);
+    let path = svgElement.getElementById("arrowPath:" + id);
+    path.setAttribute("class", "selectedArrow");
+    path.setAttribute("stroke-width", "4")
+    selectedArrows.push(arrow);
+}
+
+
+function deselectArrows() {
+    for (let i = 0; i < selectedArrows.length; i++) {
+        deselectArrow(selectedArrows[i]);
+        i--;
+    }
+}
+
+function deselectArrow(arrow) {
+    let path = svgElement.getElementById("arrowPath:" + arrow.id);
+    path.removeAttribute("class");
+    path.setAttribute("stroke-width", "3");
+    selectedArrows.splice(selectedArrows.indexOf(arrow), 1);
+}
+
+function getNodeByID(id) {
+    for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].id == id) {
+            return nodes[i];
+        }
+    }
+}
+
+function getArrowByID(id) {
+    for (let i = 0; i < arrows.length; i++) {
+        if (arrows[i].id == id) {
+            return arrows[i];
+        }
+    }
 }
