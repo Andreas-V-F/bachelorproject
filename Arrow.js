@@ -14,6 +14,8 @@ export default class Arrow {
     }
 
     drawArrow() {
+        this.svg = [];
+
         let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute("d", "M " + this.nodeOne.posX + " " + this.nodeOne.posY + " L " + this.nodeTwo.posX + " " + this.nodeTwo.posY);
         path.setAttribute("id","arrowPath:"+this.id)

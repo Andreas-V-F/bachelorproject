@@ -17,6 +17,8 @@ export default class Node {
     }
 
     drawNode() {
+        
+        this.svg = [];
 
         let radius = "6%";
 

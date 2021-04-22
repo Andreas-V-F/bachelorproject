@@ -106,6 +106,17 @@ function initTools(toolbar) {
     }
     tools.push(t);
 
+    /*
+    img = document.createElement("img");
+    img.src = "./resources/toolbarpics/move.png";
+    name = "Move node";
+    img.setAttribute("title", "" + name);
+    t = new Tool(img, name, tools.length);
+    t.toDo = function (event) {
+        console.log("move tool");
+    }
+    tools.push(t);*/
+
     img = document.createElement("img");
     img.src = "./resources/toolbarpics/circle.png";
     name = "Add node";
@@ -237,7 +248,6 @@ function arrowPopUp() {
     button.onclick = function () {
         document.getElementById("popUp").style.display = "none";
         arrowCreationUI(selectedNodes[0], selectedNodes[1], input.value);
-        deselectNodes();
         input.value = "";
     }
 
@@ -276,14 +286,17 @@ function nodeCreationUI(text, isBounded) {
 
 function nodeCreation(node) {
 
-    //rewrite so node positions are random, not hitting other objects. or maybe follows some sort of tree structure?
+    deleteNode(node);
 
     if (node.posX == 0 && node.posY == 0) {
         node.posX = Math.floor(Math.random() * width);
         node.posY = Math.floor(Math.random() * height);
     }
 
+
     let svg = node.drawNode();
+
+    console.log(svg);
 
     for (let i = 0; i < svg.length; i++) {
         let element = svg[i];
@@ -299,10 +312,13 @@ function arrowCreationUI(nodeOne, nodeTwo, text) {
     }
     arrowCreation(arrow);
     arrows.push(arrow);
+    deselectNodes();
+    springLayout();
     updateTextualView();
 }
 
 function arrowCreation(arrow) {
+    deleteArrow(arrow);
     let svg = arrow.drawArrow();
     for (let i = 0; i < svg.length; i++) {
         let element = svg[i];
@@ -327,9 +343,9 @@ function initEventListeners() {
                 for (let x = 0; x < nodes.length; x++) {
                     if (selectedNodes[i].id == nodes[x].id) {
                         let arrowArray = getArrowsFromNode(nodes[x]);
-                        for(let y = 0; y<arrowArray.length; y++){
+                        for (let y = 0; y < arrowArray.length; y++) {
                             deleteArrow(arrowArray[y])
-                            arrows.splice(arrows.indexOf(arrowArray[y]),1)
+                            arrows.splice(arrows.indexOf(arrowArray[y]), 1)
                         }
                         deleteNode(nodes[x]);
                         nodes.splice(x, 1);
@@ -346,11 +362,10 @@ function initEventListeners() {
                     }
                 }
             }
-            console.log(arrows)
-            console.log(nodes)
             selectedNodes = [];
             selectedArrows = [];
             updateTextualView();
+            springLayout();
         }
     })
 
@@ -365,7 +380,6 @@ export function setTool(toolID) {
 }
 
 export function appendParsedElements(parsedNodes, parsedArrows, ty, pref) {
-    //REMINDER: doesnt check if already existing node has changed properties other than name
     prefixes = pref;
     type = ty;
 
@@ -405,22 +419,24 @@ export function appendParsedElements(parsedNodes, parsedArrows, ty, pref) {
         }
     }
 
+    springLayout();
+
 }
 
 function nodeExists(node, nodeArray) {
     for (let i = 0; i < nodeArray.length; i++) {
-        if (node.variableName == nodeArray[i].variableName) {
+        if (node.variableName == nodeArray[i].variableName && node.isBounded == nodeArray[i].isBounded) {
             return nodeArray[i];
         }
     }
     return null;
 }
 
-function getArrowsFromNode(node){
+function getArrowsFromNode(node) {
     let arrowArray = [];
-    
-    for(let i = 0; i < arrows.length; i++){
-        if(arrows[i].nodeOne.variableName == node.variableName || arrows[i].nodeTwo.variableName == node.variableName){
+
+    for (let i = 0; i < arrows.length; i++) {
+        if (arrows[i].nodeOne.variableName == node.variableName || arrows[i].nodeTwo.variableName == node.variableName) {
             arrowArray.push(arrows[i])
         }
     }
@@ -442,9 +458,10 @@ function deleteArrow(arrow) {
 
 function arrowExists(arrow) {
     for (let i = 0; i < arrows.length; i++) {
-        if (arrow.nodeOne.variableName != arrows[i].nodeOne.variableName) {
-            continue;
-        } else if (arrow.nodeTwo.variableName == arrows[i].nodeTwo.variableName) {
+        if (arrow.nodeOne.variableName == arrows[i].nodeOne.variableName && arrow.nodeTwo.variableName == arrows[i].nodeTwo.variableName) {
+            return true;
+        }
+        if (arrow.nodeOne.variableName == arrows[i].nodeTwo.variableName && arrow.nodeTwo.variableName == arrows[i].nodeOne.variableName) {
             return true;
         }
     }
@@ -526,4 +543,77 @@ function getArrowByID(id) {
             return arrows[i];
         }
     }
+}
+
+async function springLayout() {
+    let delta = 0.1;
+    let nodesWithArrows = [];
+    for (let i = 0; i < nodes.length; i++) {
+        if (getArrowsFromNode(nodes[i]).length > 0) {
+            nodesWithArrows.push(nodes[i]);
+        }
+    }
+    let globalForce = 1000;
+    while (globalForce < -1 || globalForce > 1) {
+        let tempGlobalForce = 0;
+        for (let i = 0; i < nodesWithArrows.length; i++) {
+            let forceX = 0;
+            let forceY = 0;
+            for (let j = 0; j < nodesWithArrows.length; j++) {
+                if (nodesWithArrows[i].variableName == nodesWithArrows[j].variableName) {
+                    continue;
+                }
+
+                let f = force(nodesWithArrows[i], nodesWithArrows[j])
+                forceX += f[0];
+                forceY += f[1];
+            }
+            tempGlobalForce = Math.abs(forceX) + Math.abs(forceY);
+            nodesWithArrows[i].posX += delta * forceX;
+            nodesWithArrows[i].posY += delta * forceY;
+        }
+        for (let i = 0; i < arrows.length; i++) {
+
+            nodeCreation(arrows[i].nodeOne);
+            nodeCreation(arrows[i].nodeTwo);
+            arrowCreation(arrows[i]);
+            await sleep(16);
+        }
+        globalForce = tempGlobalForce;
+    }
+}
+
+function force(nodeOne, nodeTwo) {
+    let c0 = 1;
+    let c1 = 1;
+    let l = 250;
+
+    let distance = Math.abs(Math.sqrt(Math.pow(nodeOne.posX - nodeTwo.posX, 2) + Math.pow(nodeOne.posY - nodeTwo.posY, 2)));
+
+    let differenceVectorX = nodeOne.posX - nodeTwo.posX;
+    let differenceVectorY = nodeOne.posY - nodeTwo.posY;
+
+    let unitVectorX = differenceVectorX / distance;
+    let unitVectorY = differenceVectorY / distance;
+
+    let forceZeroX = c0 * unitVectorX / Math.pow(distance, 2);
+    let forceZeroY = c0 * unitVectorY / Math.pow(distance, 2);
+
+    let forceOneX = 0;
+    let forceOneY = 0;
+
+    if (arrowExists(new Arrow(nodeOne, nodeTwo, ""))) {
+        forceOneX = -c1 * (distance - l) * unitVectorX;
+        forceOneY = -c1 * (distance - l) * unitVectorY;
+    }
+
+    let forceX = forceZeroX + forceOneX;
+    let forceY = forceZeroY + forceOneY;
+
+    return [forceX, forceY];
+}
+
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
