@@ -13,7 +13,7 @@ export default class Node {
         this.isBounded = isBounded;
         this.posX = posX;
         this.posY = posY;
-        this.id = Date.now();
+        this.id = Math.floor(Math.random() * Date.now());
     }
 
     drawNode() {

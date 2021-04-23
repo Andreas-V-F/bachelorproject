@@ -296,8 +296,6 @@ function nodeCreation(node) {
 
     let svg = node.drawNode();
 
-    console.log(svg);
-
     for (let i = 0; i < svg.length; i++) {
         let element = svg[i];
         svgElement.appendChild(element);

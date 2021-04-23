@@ -10,7 +10,7 @@ export default class Arrow {
         this.nodeOne = nodeOne;
         this.nodeTwo = nodeTwo;
         this.predicate = predicate;
-        this.id = Date.now;
+        this.id = Math.floor(Math.random() * Date.now());;
     }
 
     drawArrow() {
