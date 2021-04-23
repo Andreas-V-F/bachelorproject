@@ -1,7 +1,7 @@
 import {checkErrors, updateTextarea} from "./TextualHandler.js";
 import SPARQL from "./sparql.js";
 import Triple from "./Triple.js";
-import { parseToVisual } from "./VisualParser.js"
+import {parseToVisual} from "./VisualParser.js"
 
 let indexOf = (arr, q) => arr.findIndex(item => q.toLowerCase() === item.toLowerCase());
 
@@ -23,20 +23,20 @@ export function parse() {
     if (t[0].toLowerCase() === "prefix") {
         t = arrayRemove(t, "PREFIX")
         let indexOfSelect = indexOf(t, "select")
-        if (indexOfSelect < 1){
+        if (indexOfSelect < 1) {
             errors.push("Missing SELECT statement")
         }
-        for (let i = 0; i < indexOfSelect/2; i++) {
+        for (let i = 0; i < indexOfSelect / 2; i++) {
             let prefix = t.shift().replace("<", "").replace(">", "")
-            if(!(prefix.split(":")[0].length > 0)) {
+            if (!(prefix.split(":")[0].length > 0)) {
                 errors.push("Missing name of prefix #" + (i + 1))
             }
-            if(!(prefix.split(":")[1] === "") ){
+            if (!(prefix.split(":")[1] === "")) {
                 errors.push("Text after colon in prefix #" + (i + 1))
             }
             let prefixLink = t.shift().replace("<", "").replace(">", "")
-            if(!prefixLink.includes("http")){
-                errors.push("Invalid link in prefix #" + (i+1))
+            if (!prefixLink.includes("http")) {
+                errors.push("Invalid link in prefix #" + (i + 1))
             }
             let temp = [prefix, prefixLink]
             parsePrefixes.push(temp)
@@ -44,28 +44,27 @@ export function parse() {
     }
     parseType = t.shift().toUpperCase()
     let indexWhere = indexOf(t, "where")
-    if(indexWhere < 1){
+    if (indexWhere < 1) {
         errors.push("Missing WHERE statement")
     }
     for (let i = 0; i < indexWhere; i++) {
         let boundVariable = t.shift()
-        if(!boundVariable.includes("?")){
-            errors.push("Missing ? in bound variable #" + (i+1))
+        if (!boundVariable.includes("?")) {
+            errors.push("Missing ? in bound variable #" + (i + 1))
         }
         parseBoundVariables[i] = boundVariable
     }
     let indexOfLeftB = indexOf(t, "{")
-    if(indexOfLeftB !== 1 ){
+    if (indexOfLeftB !== 1) {
         errors.push("Unknown character in between WHERE and {")
     }
-    t = t.slice(indexOfLeftB+1)
+    t = t.slice(indexOfLeftB + 1)
     t = arrayRemove(t, ".")
     let indexOfRightB = indexOf(t, "}")
     for (let i = 0; i < indexOfRightB; i += 3) {
         parseTriples[i / 3] = new Triple(t.shift(), t.shift(), t.shift())
     }
-    console.log(parseTriples)
-    if(errors.length === 0){
+    if (errors.length === 0) {
         parseToVisual(new SPARQL(parseTriples, parseType, parseBoundVariables, parsePrefixes))
     }
     checkErrors(errors)

@@ -27,6 +27,7 @@ export function initiateTextualHandler(){
     errorConsole.readOnly = true
     errorConsole.style.height = height
     errorConsole.style.width = width
+    errorConsole.style.resize = "none"
     div.append(parseText)
     div.append(document.createElement("br"))
     div.append(parseButton)
