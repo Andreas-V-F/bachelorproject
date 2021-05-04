@@ -1,4 +1,4 @@
-import {parse} from "./TextParser.js";
+import "./grammar.js"
 
 let height = "200px"
 let width = "400px"
@@ -45,5 +45,14 @@ export function checkErrors(errors){
     for(let i = 0; i < errors.length; i++){
         document.getElementById("errorConsole").value += (errors[i] + "\n")
     }
+}
 
+function parse()
+{
+    var text =  document.getElementById("parse").value
+    try {
+        var entry = PARSER.parse(text);
+    } catch (err) {
+        document.getElementById("errorConsole").value = "Line " + err.location.start.line + "," + " column " + err.location.start.column + ": " + err
+    }
 }
