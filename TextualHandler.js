@@ -1,4 +1,7 @@
 import "./grammar.js"
+import {parseToVisual} from "./VisualParser.js";
+
+
 
 let height = "200px"
 let width = "400px"
@@ -51,7 +54,9 @@ function parse()
 {
     var text =  document.getElementById("parse").value
     try {
+        document.getElementById("errorConsole").value = ""
         var entry = PARSER.parse(text);
+        parseToVisual(entry)
     } catch (err) {
         document.getElementById("errorConsole").value = "Line " + err.location.start.line + "," + " column " + err.location.start.column + ": " + err
     }
