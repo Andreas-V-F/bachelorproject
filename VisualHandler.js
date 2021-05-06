@@ -10,26 +10,14 @@ var currentTool = 0;
 var tools = [];
 var selectedNodes = [];
 var selectedLinks = [];
+var type = "SELECT";
+var prefixes = [];
 
 //intialize data
 var graph = {
     nodes: [
-        { name: "Alice", bound: true },
-        { name: "Bob", bound: true },
-        { name: "Chen", bound: false },
-        { name: "Dawg", bound: true },
-        { name: "Ethan", bound: true },
-        { name: "George", bound: true },
-        { name: "Frank", bound: false },
-        { name: "Hanes", bound: true }
     ],
     links: [
-        { source: "Alice", target: "Bob", value: "corsti" },
-        { source: "Chen", target: "Bob", value: "corsti2" },
-        { source: "Dawg", target: "Chen", value: "corsti3" },
-        { source: "Hanes", target: "Frank", value: "corsti4" },
-        { source: "Hanes", target: "George", value: "corsti5" },
-        { source: "Dawg", target: "Ethan", value: "corsti6" }
     ]
 };
 
@@ -333,11 +321,12 @@ function draw() {
             })
     }
 
-    for(let i = 0; i<graph.nodes.length; i++){
-        if(graph.nodes[i].bound){
+    for (let i = 0; i < graph.nodes.length; i++) {
+        if (graph.nodes[i].bound) {
             svg.select("#circleID" + i).attr("fill", "blue");
         }
     }
+    parse();
 }
 
 function dragstarted(d) {
@@ -370,10 +359,6 @@ function addNode(inputName, inputBound) {
     graph.nodes.push({ name: inputName, bound: inputBound })
     console.log(graph);
     draw();
-}
-
-export function appendParsedElements() {
-
 }
 
 function circleClick(node) {
@@ -449,12 +434,12 @@ function removeNode(node) {
 }
 
 function selectLink(link) {
-    svg.select("#linkID" + link.index).attr("stroke", "black").attr("stroke-width","6");
+    svg.select("#linkID" + link.index).attr("stroke", "black").attr("stroke-width", "6");
     selectedLinks.push(link);
 }
 
 function deselectLink(link) {
-    svg.select("#linkID" + link.index).attr("stroke", "#999").attr("stroke-width","3");
+    svg.select("#linkID" + link.index).attr("stroke", "#999").attr("stroke-width", "3");
     selectedLinks.splice(selectedLinks.indexOf(link), 1);
 }
 
@@ -487,3 +472,16 @@ function initEventListeners() {
         }
     })
 }
+
+export function appendParsedElements(parsedGraph, parsedType, parsedPrefixes) {
+
+    type = parsedType;
+    prefixes = parsedPrefixes;
+    graph = parsedGraph;
+    draw();
+}
+
+function parse() {
+    parseToSPARQL(graph.links, type, prefixes)
+}
+
