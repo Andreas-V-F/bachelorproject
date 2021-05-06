@@ -9,8 +9,4 @@ export default class Tool{
         this.name = name;
         this.id = id;
     }
-
-    toDo(){
-        console.log("not overwritten");
-    }
 }
