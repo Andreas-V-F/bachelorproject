@@ -5,6 +5,7 @@ import {parseToVisual} from "./VisualParser.js";
 
 let height = "200px"
 let width = "400px"
+var stylesheetChanged = false
 export function initiateTextualHandler(){
     let div = document.createElement("div")
     div.style.float = "left"
@@ -39,44 +40,42 @@ export function initiateTextualHandler(){
     div.append(errorConsole)
 
 
+
 }
 export function updateTextarea(updatedText){
     document.getElementById("parse").value = updatedText
 }
 
-export function checkErrors(errors){
-    document.getElementById("errorConsole").value = ""
-    for(let i = 0; i < errors.length; i++){
-        document.getElementById("errorConsole").value += (errors[i] + "\n")
-    }
-}
-
 function parse()
 {
     var text =  document.getElementById("parse").value
-    var ss = document.styleSheets[0]
+    var stylesheet = document.styleSheets[0]
     try {
         var entry = PARSER.parse(text);
         console.log(entry)
         parseToVisual(entry)
         document.getElementById("errorConsole").value = "Parse success!!!"
-        if ("insertRule" in ss) {
-            if(ss.rules.length > 0){
-                ss.deleteRule(0)
+        console.log(stylesheet.rules)
+        if ("insertRule" in stylesheet) {
+            if(stylesheetChanged){
+                stylesheet.deleteRule(stylesheet.rules.length-1)
             }
-            ss.insertRule('::selection { background: dodgerblue; color: white }', 0);
+            stylesheetChanged = true
+            stylesheet.insertRule('::selection { background: dodgerblue; color: white }', stylesheet.rules.length);
         }
     } catch (err) {
             console.log(err)
             document.getElementById("errorConsole").value = "Line " + err.location.start.line + "," + " column " + err.location.start.column + ": " + err
             var textarea = document.getElementById("parse")
-            if ("insertRule" in ss) {
-                if(ss.rules.length > 0){
-                    ss.deleteRule(0)
+            if ("insertRule" in stylesheet) {
+                if(stylesheetChanged){
+                    stylesheet.deleteRule(stylesheet.rules.length-1)
                 }
-            ss.insertRule('::selection { background: red; color: black}', 0);
+                stylesheetChanged = true
+            stylesheet.insertRule('::selection { background: red; color: black}', stylesheet.rules.length);
             }
             textarea.focus();
             textarea.setSelectionRange(err.location.start.offset, err.location.end.offset);
         }
+
 }

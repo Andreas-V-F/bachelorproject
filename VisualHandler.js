@@ -54,7 +54,7 @@ function styleRules() {
     styleSheet.insertRule(".nodes circle {stroke: #fff;stroke-width: 1.5px;}", styleSheet.cssRules.length);
     styleSheet.insertRule(".nodes circle {stroke: #fff;stroke-width: 1.5px;}", styleSheet.cssRules.length);
     styleSheet.insertRule("text {-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}", styleSheet.cssRules.length);
-    styleSheet.insertRule(".nodeText {pointer-events: none; fill: white}")
+    styleSheet.insertRule(".nodeText {pointer-events: none; fill: white}", styleSheet.cssRules.length)
 }
 
 function initCanvas(div) {
@@ -162,6 +162,9 @@ function nodePopUp() {
     button.textContent = "Submit";
     button.onclick = function () {
         document.getElementById("popUp").style.display = "none";
+        if(!input.value.includes("?")){
+            input.value = "?" + input.value
+        }
         addNode(input.value, checkbox.checked);
         input.value = "";
         checkbox.checked = false;
