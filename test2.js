@@ -3,14 +3,13 @@ var height = 900;
 var svgarray = [];
 
 let svg = d3.select("body").append("svg")
-    .attr("id","cor")
     .attr("viewBox", [0, 0, width, height])
     .attr("cursor", "crosshair")
 
 var color = d3.scaleOrdinal(d3.schemeCategory20);
 
 var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function (d) { return d.id; }))
+    .force("link", d3.forceLink().id(function (d) { return d.id; }).distance(200))
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(width / 2, height / 2));
 
@@ -27,14 +26,13 @@ function jsonLoader() {
             .attr("stroke-width", function (d) { return Math.sqrt(d.value); });
 
         var node = svg.append("g")
-            .attr("id","00")
             .attr("class", "nodes")
             .selectAll("g")
             .data(graph.nodes)
             .enter().append("g")
 
         var circles = node.append("circle")
-            .attr("r", 5)
+            .attr("r", 25)
             .attr("fill", function (d) { return color(d.group); })
             .call(d3.drag()
                 .on("start", dragstarted)
@@ -94,5 +92,5 @@ function dragended(d) {
     if (!d3.event.active) simulation.alphaTarget(0);
     d.fx = null;
     d.fy = null;
-    jsonLoader();
 }
+

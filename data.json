@@ -5,7 +5,7 @@
       {"id": "Mlle.Baptistine"}
     ],
     "links": [
-      {"source": "Myriel", "target": "Napoleon"},
-      {"source": "Napoleon", "target": "Mlle.Baptistine"}
+      {"source": "Myriel", "target": "Napoleon", "value": "50"},
+      {"source": "Napoleon", "target": "Mlle.Baptistine","value": "50"}
     ]
   }

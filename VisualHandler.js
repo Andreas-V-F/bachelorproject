@@ -7,8 +7,6 @@ var width = 1000;
 var height = 900;
 var styleSheet;
 var svgElement;
-var link;
-var node;
 var tools = [];
 var nodes = [];
 var arrows = [];
