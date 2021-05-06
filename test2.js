@@ -15,7 +15,7 @@ var simulation = d3.forceSimulation()
     .force("center", d3.forceCenter(width / 2, height / 2));
 
 function jsonLoader() {
-
+    svg.selectAll("g").remove()
     d3.json("data.json", function (error, graph) {
         if (error) throw error;
 
@@ -78,18 +78,6 @@ function jsonLoader() {
 
 jsonLoader();
 
-let svg2 = document.getElementById("cor");
-console.log(svg2);
-
-let fuckcor = document.getElementById("00")
-console.log(fuckcor);
-
-console.log(svgarray.length)
-
-for(let i = 0; i<svgarray.length; i++){
-    console.log(svgarray[i]);
-    svg2.removeChild(svgarray[i]);
-}
 
 function dragstarted(d) {
     if (!d3.event.active) simulation.alphaTarget(0.3).restart();
@@ -106,4 +94,5 @@ function dragended(d) {
     if (!d3.event.active) simulation.alphaTarget(0);
     d.fx = null;
     d.fy = null;
+    jsonLoader();
 }
