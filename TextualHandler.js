@@ -1,4 +1,7 @@
-import {parse} from "./TextParser.js";
+import "./grammar.js"
+import {parseToVisual} from "./VisualParser.js";
+
+
 
 let height = "200px"
 let width = "400px"
@@ -14,6 +17,7 @@ export function initiateTextualHandler(){
     parseText.style.resize = "none"
     parseText.style.height = height
     parseText.style.width = width
+    parseText.spellcheck = false
     parseText.onchange = function (){
         parse()
     }
@@ -45,5 +49,34 @@ export function checkErrors(errors){
     for(let i = 0; i < errors.length; i++){
         document.getElementById("errorConsole").value += (errors[i] + "\n")
     }
+}
 
+function parse()
+{
+    var text =  document.getElementById("parse").value
+    var ss = document.styleSheets[0]
+    try {
+        var entry = PARSER.parse(text);
+        console.log(entry)
+        parseToVisual(entry)
+        document.getElementById("errorConsole").value = "Parse success!!!"
+        if ("insertRule" in ss) {
+            if(ss.rules.length > 0){
+                ss.deleteRule(0)
+            }
+            ss.insertRule('::selection { background: dodgerblue; color: white }', 0);
+        }
+    } catch (err) {
+            console.log(err)
+            document.getElementById("errorConsole").value = "Line " + err.location.start.line + "," + " column " + err.location.start.column + ": " + err
+            var textarea = document.getElementById("parse")
+            if ("insertRule" in ss) {
+                if(ss.rules.length > 0){
+                    ss.deleteRule(0)
+                }
+            ss.insertRule('::selection { background: red; color: black}', 0);
+            }
+            textarea.focus();
+            textarea.setSelectionRange(err.location.start.offset, err.location.end.offset);
+        }
 }
