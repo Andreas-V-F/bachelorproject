@@ -1,5 +1,4 @@
 import { appendParsedElements } from './VisualHandler.js';
-import Node from './Node.js';
 import { returnToText } from "./TextParser.js";
 import SPARQL from './sparql.js';
 import Triple from './Triple.js';
