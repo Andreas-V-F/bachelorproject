@@ -7,6 +7,8 @@ var width = 1000;
 var height = 900;
 var styleSheet;
 var svgElement;
+var link;
+var node;
 var tools = [];
 var nodes = [];
 var arrows = [];
@@ -66,12 +68,11 @@ function initCanvas(div) {
 
     initTools(toolbar);
 
-    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("height", "" + height + "");
-    svg.setAttribute("width", "" + width + "");
-    svg.setAttribute("viewBox", "0 0 " + width + " " + height + "");
-    svg.setAttribute("id", "svgCanvas");
-    div.appendChild(svg);
+
+    let svg = d3.create("svg")
+        .attr("viewBox", [0, 0, width, height])
+        .attr("cursor", "crosshair")
+
     svgElement = svg;
 }
 

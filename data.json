@@ -1,0 +1,11 @@
+{
+    "nodes": [
+      {"id": "Myriel"},
+      {"id": "Napoleon"},
+      {"id": "Mlle.Baptistine"}
+    ],
+    "links": [
+      {"source": "Myriel", "target": "Napoleon"},
+      {"source": "Napoleon", "target": "Mlle.Baptistine"}
+    ]
+  }
