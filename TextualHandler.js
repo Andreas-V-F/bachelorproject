@@ -17,6 +17,7 @@ export function initiateTextualHandler(){
     parseText.style.resize = "none"
     parseText.style.height = height
     parseText.style.width = width
+    parseText.spellcheck = false
     parseText.onchange = function (){
         parse()
     }
@@ -53,11 +54,29 @@ export function checkErrors(errors){
 function parse()
 {
     var text =  document.getElementById("parse").value
+    var ss = document.styleSheets[0]
     try {
-        document.getElementById("errorConsole").value = ""
         var entry = PARSER.parse(text);
+        console.log(entry)
         parseToVisual(entry)
+        document.getElementById("errorConsole").value = "Parse success!!!"
+        if ("insertRule" in ss) {
+            if(ss.rules.length > 0){
+                ss.deleteRule(0)
+            }
+            ss.insertRule('::selection { background: dodgerblue; color: white }', 0);
+        }
     } catch (err) {
-        document.getElementById("errorConsole").value = "Line " + err.location.start.line + "," + " column " + err.location.start.column + ": " + err
-    }
+            console.log(err)
+            document.getElementById("errorConsole").value = "Line " + err.location.start.line + "," + " column " + err.location.start.column + ": " + err
+            var textarea = document.getElementById("parse")
+            if ("insertRule" in ss) {
+                if(ss.rules.length > 0){
+                    ss.deleteRule(0)
+                }
+            ss.insertRule('::selection { background: red; color: black}', 0);
+            }
+            textarea.focus();
+            textarea.setSelectionRange(err.location.start.offset, err.location.end.offset);
+        }
 }
