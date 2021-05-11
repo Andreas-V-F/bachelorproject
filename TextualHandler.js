@@ -5,6 +5,11 @@ import {parseToVisual} from "./VisualParser.js";
 
 let height = "200px"
 let width = "400px"
+<<<<<<< Updated upstream
+=======
+let time = 0
+var stylesheetChanged = false
+>>>>>>> Stashed changes
 export function initiateTextualHandler(){
     let div = document.createElement("div")
     div.style.float = "left"
@@ -22,10 +27,11 @@ export function initiateTextualHandler(){
         parse()
     }
     let parseButton = document.createElement("button")
-    parseButton.textContent = "Parse"
+    parseButton.textContent = "Run"
     parseButton.onclick = function(){
         parse()
     }
+
     let errorConsole = document.createElement("textarea")
     errorConsole.setAttribute("id", "errorConsole")
     errorConsole.readOnly = true
@@ -38,7 +44,10 @@ export function initiateTextualHandler(){
     div.append(document.createElement("br"))
     div.append(errorConsole)
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 }
 export function updateTextarea(updatedText){
     document.getElementById("parse").value = updatedText
@@ -54,12 +63,15 @@ export function checkErrors(errors){
 function parse()
 {
     var text =  document.getElementById("parse").value
+<<<<<<< Updated upstream
     var ss = document.styleSheets[0]
+=======
+>>>>>>> Stashed changes
     try {
         var entry = PARSER.parse(text);
-        console.log(entry)
         parseToVisual(entry)
         document.getElementById("errorConsole").value = "Parse success!!!"
+<<<<<<< Updated upstream
         if ("insertRule" in ss) {
             if(ss.rules.length > 0){
                 ss.deleteRule(0)
@@ -80,3 +92,42 @@ function parse()
             textarea.setSelectionRange(err.location.start.offset, err.location.end.offset);
         }
 }
+=======
+        $('#parse').highlightTextarea('destroy')
+    } catch (err) {
+
+            var start
+            var end
+            if(err.location.start.offset + findWordLength(text, err.location.start.offset) >= text.length){
+            start = text.length - 2
+            end = text.length - 1
+            }
+            else if(err.found === "\n") {
+                start = err.location.start.offset -1
+                end = err.location.start.offset + findWordLength(text, err.location.start.offset) + 2
+            } else
+            {
+                start = err.location.start.offset
+                end = err.location.start.offset + findWordLength(text, err.location.start.offset)
+                if(start === end){
+                    end+=1
+                }
+            }
+
+            document.getElementById("errorConsole").value = "Line " + err.location.start.line + "," + " column " + err.location.start.column + ": " + err
+            $('#parse').highlightTextarea('destroy')
+            $("#parse").highlightTextarea({
+                color: "#FF0000",
+            ranges: [[start, end]]
+            });
+    }
+    document.getElementById("parse").focus()
+
+}
+
+function findWordLength(text, index){
+
+    return text.substring(index).split(" ").join("\n").split("\n")[0].length
+}
+
+>>>>>>> Stashed changes

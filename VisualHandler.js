@@ -14,9 +14,14 @@ var posX;
 var posY;
 var currentTool = 0;
 var type = "SELECT";
+<<<<<<< Updated upstream
 var prefixes = [];
 var selectedNodes = [];
 var selectedArrows = [];
+=======
+var prefixes = {prefixes: []
+}
+>>>>>>> Stashed changes
 
 window.onclick = function (event) {
     let popUp = document.getElementById("popUp");
@@ -268,6 +273,7 @@ function nodeCreationUI(text, isBounded) {
         return;
     }
 
+<<<<<<< Updated upstream
     let node = new Node(text, isBounded, posX, posY);
 
     if (text[0] != "?" && !text.includes(":")) {
@@ -282,6 +288,12 @@ function nodeCreationUI(text, isBounded) {
     nodeCreation(node);
     nodes.push(node);
 
+=======
+function dragstarted(d) {
+    if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+>>>>>>> Stashed changes
 }
 
 function nodeCreation(node) {
@@ -324,6 +336,7 @@ function arrowCreation(arrow) {
     }
 }
 
+<<<<<<< Updated upstream
 function initEventListeners() {
     svgElement.addEventListener('mousedown', (event) => {
         let point = svgElement.createSVGPoint();
@@ -367,6 +380,12 @@ function initEventListeners() {
         }
     })
 
+=======
+function addNode(inputName, inputBound) {
+    graph.nodes.push({ name: inputName, bound: inputBound })
+
+    draw();
+>>>>>>> Stashed changes
 }
 
 export function setTool(toolID) {
@@ -581,12 +600,21 @@ async function springLayout() {
     }
 }
 
+<<<<<<< Updated upstream
 function force(nodeOne, nodeTwo) {
     let c0 = 1;
     let c1 = 1;
     let l = 250;
 
     let distance = Math.abs(Math.sqrt(Math.pow(nodeOne.posX - nodeTwo.posX, 2) + Math.pow(nodeOne.posY - nodeTwo.posY, 2)));
+=======
+export function appendParsedElements(parsedGraph, parsedType, parsedPrefixes) {
+    type = parsedType;
+    prefixes = parsedPrefixes;
+    graph = parsedGraph;
+    draw();
+}
+>>>>>>> Stashed changes
 
     let differenceVectorX = nodeOne.posX - nodeTwo.posX;
     let differenceVectorY = nodeOne.posY - nodeTwo.posY;

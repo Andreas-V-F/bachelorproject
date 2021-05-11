@@ -7,10 +7,23 @@ import Triple from './Triple.js';
 
 export function parseToVisual(spq) {
 
+<<<<<<< Updated upstream
     let nArray = nodeArray(spq.triples, spq.unboundVariables);
     let aArray = arrowArray(nArray, spq.triples, spq.prefixes);
 
     appendParsedElements(nArray, aArray, spq.type, spq.prefixes);
+=======
+    var graph = {
+        nodes: [
+        ],
+        links: [
+        ]
+    };
+
+    let newGraph = fillGraph(graph, spq)
+
+    appendParsedElements(newGraph, spq.type, spq.listOfPrefixes);
+>>>>>>> Stashed changes
 }
 
 function arrowArray(nArray, triples) {

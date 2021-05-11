@@ -1,10 +1,12 @@
 import {updateTextarea} from "./TextualHandler.js";
 
 export function returnToText(sparql) {
+
     let outputText = ""
-    for (let i = 0; i < sparql.prefixes.length; i++) {
-        outputText += "PREFIX " + sparql.prefixes[i][0] + " " + "<" + sparql.prefixes[i][1] + ">\n"
+    for (let i = 0; i < sparql.listOfPrefixes.length; i++) {
+        outputText += "PREFIX " + sparql.listOfPrefixes[i][0].name + " " + "<" + sparql.listOfPrefixes[i][0].link + ">\n"
     }
+
     outputText += sparql.type
     for (let i = 0; i < sparql.boundVariables.length; i++) {
         outputText += " " + sparql.boundVariables[i]

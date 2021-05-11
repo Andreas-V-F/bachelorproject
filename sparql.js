@@ -11,14 +11,14 @@ export default class SPARQL {
     boundVariables = []
     unboundVariables = []
     literals = []
-    prefixes = []
+    listOfPrefixes
 
 
-    constructor(triples, type, boundVariables,prefixes) {
+    constructor(triples, type, boundVariables, prefixes) {
         this.triples = triples
         this.type = type
         this.boundVariables = boundVariables
-        this.prefixes = prefixes;
+        this.listOfPrefixes = prefixes;
         this.setRest()
     }
 
