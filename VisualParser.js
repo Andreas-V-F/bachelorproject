@@ -1,18 +1,12 @@
 import { appendParsedElements } from './VisualHandler.js';
-import Node from './Node.js';
-import Arrow from './Arrow.js';
-import { returnToText} from "./TextParser.js";
+import { returnToText } from "./TextParser.js";
 import SPARQL from './sparql.js';
 import Triple from './Triple.js';
 
 export function parseToVisual(spq) {
 
-<<<<<<< Updated upstream
-    let nArray = nodeArray(spq.triples, spq.unboundVariables);
-    let aArray = arrowArray(nArray, spq.triples, spq.prefixes);
+    console.log(spq);
 
-    appendParsedElements(nArray, aArray, spq.type, spq.prefixes);
-=======
     var graph = {
         nodes: [
         ],
@@ -23,58 +17,40 @@ export function parseToVisual(spq) {
     let newGraph = fillGraph(graph, spq)
 
     appendParsedElements(newGraph, spq.type, spq.listOfPrefixes);
->>>>>>> Stashed changes
 }
 
-function arrowArray(nArray, triples) {
-    let arrows = [];
-    for (let i = 0; i < triples.length; i++) {
-        arrows.push(new Arrow(getNode(nArray, triples[i].subject), getNode(nArray, triples[i].object), triples[i].predicate));
+function fillGraph(graph, spq) {
+
+    for (let i = 0; i < spq.boundVariables.length; i++) {
+        graph.nodes.push({ name: spq.boundVariables[i], bound: true })
     }
-    return arrows;
-}
 
-function nodeArray(triples, unboundVariables) {
-    let nodes = [];
-    for (let i = 0; i < triples.length; i++) {
-        let isBounded = isBoundedVariable(triples[i].subject, unboundVariables);
-        nodes.push(new Node(triples[i].subject, isBounded, 0, 0));
-        isBounded = isBoundedVariable(triples[i].object, unboundVariables);
-        nodes.push(new Node(triples[i].object, isBounded, 0, 0));
+    for (let i = 0; i < spq.unboundVariables.length; i++) {
+        graph.nodes.push({ name: spq.unboundVariables[i], bound: false })
     }
-    return nodes;
-}
 
-function isBoundedVariable(variable, unboundVariables) {
-    if (unboundVariables.includes(variable)) {
-        return false;
+    for (let i = 0; i < spq.triples.length; i++) {
+        graph.links.push({ source: spq.triples[i].subject, target: spq.triples[i].object, value: spq.triples[i].predicate })
     }
-    return true;
+
+    return graph;
 }
 
-function getNode(nodeArray, variable) {
-    for (let i = 0; i < nodeArray.length; i++) {
-        if (nodeArray[i].variableName == variable) {
-            return nodeArray[i];
-        }
-    }
-}
-
-export function parseToSPARQL(arrows, type, prefixes) {
+export function parseToSPARQL(links, type, prefixes) {
 
     let triples = [];
     let boundVariables = [];
 
-    for(let i = 0; i<arrows.length; i++){
-        triples.push(new Triple(arrows[i].nodeOne.variableName, arrows[i].predicate, arrows[i].nodeTwo.variableName));
-        if(arrows[i].nodeOne.isBounded){
-            if(!boundVariables.includes(arrows[i].nodeOne.variableName)){
-                boundVariables.push(arrows[i].nodeOne.variableName);
+    for (let i = 0; i < links.length; i++) {
+        triples.push(new Triple(links[i].source.name, links[i].value, links[i].target.name));
+        if (links[i].source.bound) {
+            if (!boundVariables.includes(links[i].source.name)) {
+                boundVariables.push(links[i].source.name);
             }
-        } 
-        if(arrows[i].nodeTwo.isBounded){
-            if(!boundVariables.includes(arrows[i].nodeTwo.variableName)){
-                boundVariables.push(arrows[i].nodeTwo.variableName);
+        }
+        if (links[i].target.bound) {
+            if (!boundVariables.includes(links[i].target.name)) {
+                boundVariables.push(links[i].target.name);
             }
         }
     }
