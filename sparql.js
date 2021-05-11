@@ -17,9 +17,10 @@ export default class SPARQL {
     constructor(triples, type, boundVariables, prefixes) {
         this.triples = triples
         this.type = type
-        this.boundVariables = boundVariables
+        this.setBoundVariables(boundVariables)
         this.listOfPrefixes = prefixes;
         this.setRest()
+        console.log(this)
     }
 
     setRest() {
@@ -33,8 +34,8 @@ export default class SPARQL {
     }
 
     setUnboundVariables(key, value) {
-        if (!this.boundVariables.includes(value) && !this.unboundVariables.includes(value) && key !== "predicate") {
-            this.unboundVariables.push(value)
+        if (!this.variableExists(this.boundVariables, value) && !this.variableExists(this.unboundVariables, value)  && key !== "predicate") {
+            this.unboundVariables.push({name: value, colour: Math.floor(Math.random()*16777215).toString(16)})
         }
     }
 
@@ -44,5 +45,21 @@ export default class SPARQL {
         }
     }
 
-}
+    setBoundVariables(boundVariables){
+        for(let i = 0; i < boundVariables.length; i++)
+        {
+            this.boundVariables.push({name: boundVariables[i], colour: Math.floor(Math.random()*16777215).toString(16)})
+        }
+    }
 
+    variableExists(arr, name){
+        for(let i = 0; i < arr.length; i++){
+            if(arr[i].name === name){
+                return true
+            }
+        }
+        return false
+    }
+
+
+}

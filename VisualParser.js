@@ -22,11 +22,11 @@ export function parseToVisual(spq) {
 function fillGraph(graph, spq) {
 
     for (let i = 0; i < spq.boundVariables.length; i++) {
-        graph.nodes.push({ name: spq.boundVariables[i], bound: true })
+        graph.nodes.push({ name: spq.boundVariables[i].name, bound: true })
     }
 
     for (let i = 0; i < spq.unboundVariables.length; i++) {
-        graph.nodes.push({ name: spq.unboundVariables[i], bound: false })
+        graph.nodes.push({ name: spq.unboundVariables[i].name, bound: false })
     }
 
     for (let i = 0; i < spq.triples.length; i++) {

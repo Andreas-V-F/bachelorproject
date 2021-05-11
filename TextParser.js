@@ -8,7 +8,7 @@ export function returnToText(sparql) {
     }
     outputText += sparql.type
     for (let i = 0; i < sparql.boundVariables.length; i++) {
-        outputText += " " + sparql.boundVariables[i]
+        outputText += " " + sparql.boundVariables[i].name
     }
     outputText += "\nWHERE {\n"
     for (let i = 0; i < sparql.triples.length; i++) {

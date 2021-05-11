@@ -51,12 +51,22 @@ function parse()
     var text =  document.getElementById("parse").value
     try {
         var entry = PARSER.parse(text);
+        console.log(entry)
         parseToVisual(entry)
         document.getElementById("errorConsole").value = "Parse success!!!"
         $('#parse').highlightTextarea('destroy')
+        highlightWord(text, "?name")
+        highlightWord(text, "?x")
+        for(let i = 0; i < entry.unboundVariables.length; i++){
+            $("#parse").highlightTextarea({
+                words: [{color: "#FF0F00",  words: [].push(entry.unboundVariables[i].name)}]
+            });
+            console.log("test")
+        }
     } catch (err) {
             var start
             var end
+            console.log(err)
             if(err.location.start.offset + findWordLength(text, err.location.start.offset) >= text.length){
             start = text.length - 2
             end = text.length - 1
@@ -85,7 +95,22 @@ function parse()
 }
 
 function findWordLength(text, index){
-
     return text.substring(index).split(" ").join("\n").split("\n")[0].length
 }
+
+function highlightWord(text, word){
+    var indexOflast = -1
+    var ranges = []
+    while((indexOflast = text.indexOf(word, indexOflast+1)) >= 0){
+        var range = [indexOflast, indexOflast + findWordLength(text, indexOflast)]
+        ranges.push(range)
+    }
+    $("#parse").highlightTextarea({
+        ranges: {
+            color:'#ADF0FF',
+            ranges: ranges
+        }
+    });
+}
+
 
