@@ -14,14 +14,11 @@ var posX;
 var posY;
 var currentTool = 0;
 var type = "SELECT";
-<<<<<<< Updated upstream
-var prefixes = [];
 var selectedNodes = [];
 var selectedArrows = [];
-=======
 var prefixes = {prefixes: []
 }
->>>>>>> Stashed changes
+
 
 window.onclick = function (event) {
     let popUp = document.getElementById("popUp");
@@ -532,13 +529,6 @@ function selectArrow(id) {
 }
 
 
-function deselectArrows() {
-    for (let i = 0; i < selectedArrows.length; i++) {
-        deselectArrow(selectedArrows[i]);
-        i--;
-    }
-}
-
 function deselectArrow(arrow) {
     let path = svgElement.getElementById("arrowPath:" + arrow.id);
     path.removeAttribute("class");
@@ -546,100 +536,10 @@ function deselectArrow(arrow) {
     selectedArrows.splice(selectedArrows.indexOf(arrow), 1);
 }
 
-function getNodeByID(id) {
-    for (let i = 0; i < nodes.length; i++) {
-        if (nodes[i].id == id) {
-            return nodes[i];
-        }
-    }
-}
 
-function getArrowByID(id) {
-    for (let i = 0; i < arrows.length; i++) {
-        if (arrows[i].id == id) {
-            return arrows[i];
-        }
-    }
-}
-
-async function springLayout() {
-    let delta = 0.1;
-    let nodesWithArrows = [];
-    for (let i = 0; i < nodes.length; i++) {
-        if (getArrowsFromNode(nodes[i]).length > 0) {
-            nodesWithArrows.push(nodes[i]);
-        }
-    }
-    let globalForce = 1000;
-    while (globalForce < -1 || globalForce > 1) {
-        let tempGlobalForce = 0;
-        for (let i = 0; i < nodesWithArrows.length; i++) {
-            let forceX = 0;
-            let forceY = 0;
-            for (let j = 0; j < nodesWithArrows.length; j++) {
-                if (nodesWithArrows[i].variableName == nodesWithArrows[j].variableName) {
-                    continue;
-                }
-
-                let f = force(nodesWithArrows[i], nodesWithArrows[j])
-                forceX += f[0];
-                forceY += f[1];
-            }
-            tempGlobalForce = Math.abs(forceX) + Math.abs(forceY);
-            nodesWithArrows[i].posX += delta * forceX;
-            nodesWithArrows[i].posY += delta * forceY;
-        }
-        for (let i = 0; i < arrows.length; i++) {
-
-            nodeCreation(arrows[i].nodeOne);
-            nodeCreation(arrows[i].nodeTwo);
-            arrowCreation(arrows[i]);
-            await sleep(16);
-        }
-        globalForce = tempGlobalForce;
-    }
-}
-
-<<<<<<< Updated upstream
-function force(nodeOne, nodeTwo) {
-    let c0 = 1;
-    let c1 = 1;
-    let l = 250;
-
-    let distance = Math.abs(Math.sqrt(Math.pow(nodeOne.posX - nodeTwo.posX, 2) + Math.pow(nodeOne.posY - nodeTwo.posY, 2)));
-=======
 export function appendParsedElements(parsedGraph, parsedType, parsedPrefixes) {
     type = parsedType;
     prefixes = parsedPrefixes;
     graph = parsedGraph;
     draw();
-}
->>>>>>> Stashed changes
-
-    let differenceVectorX = nodeOne.posX - nodeTwo.posX;
-    let differenceVectorY = nodeOne.posY - nodeTwo.posY;
-
-    let unitVectorX = differenceVectorX / distance;
-    let unitVectorY = differenceVectorY / distance;
-
-    let forceZeroX = c0 * unitVectorX / Math.pow(distance, 2);
-    let forceZeroY = c0 * unitVectorY / Math.pow(distance, 2);
-
-    let forceOneX = 0;
-    let forceOneY = 0;
-
-    if (arrowExists(new Arrow(nodeOne, nodeTwo, ""))) {
-        forceOneX = -c1 * (distance - l) * unitVectorX;
-        forceOneY = -c1 * (distance - l) * unitVectorY;
-    }
-
-    let forceX = forceZeroX + forceOneX;
-    let forceY = forceZeroY + forceOneY;
-
-    return [forceX, forceY];
-}
-
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }

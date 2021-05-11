@@ -7,7 +7,7 @@ var prefixesClean = prefix.join().replace(/,/g, "")
 var listOfPrefixes = {prefixes: []
 }
 listOfPrefixes.prefixes.push({name: prefixesClean, link: linkClean})
-return listOfPrefixes}
+return listOfPrefixes.prefixes}
 
 where = lineBreak* "WHERE"
 
@@ -15,11 +15,7 @@ lbracket = space* lineBreak* space* "{"
 
 boundvarible = space* questionMark l:word {return "?" +l.join().replace(/,/g, "")}
 
-<<<<<<< Updated upstream
-triples = lineBreak? space? "\t"? questionMark subject:word space predicate:word space questionMark object:word {return new Triple("?" + subject.join().replace(/,/g, ""), predicate.join().replace(/,/g, ""), "?" + object.join().replace(/,/g, ""))}
-=======
 triples = lineBreak* space* "\t"? questionMark subject:word space predicate:word space questionMark object:word (space ".")? lineBreak {return new Triple("?" + subject.join().replace(/,/g, ""), predicate.join().replace(/,/g, ""), "?" + object.join().replace(/,/g, ""))}
->>>>>>> Stashed changes
 
 rbracket = space* lineBreak* "}"
 

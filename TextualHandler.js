@@ -5,11 +5,7 @@ import {parseToVisual} from "./VisualParser.js";
 
 let height = "200px"
 let width = "400px"
-<<<<<<< Updated upstream
-=======
-let time = 0
-var stylesheetChanged = false
->>>>>>> Stashed changes
+
 export function initiateTextualHandler(){
     let div = document.createElement("div")
     div.style.float = "left"
@@ -44,58 +40,21 @@ export function initiateTextualHandler(){
     div.append(document.createElement("br"))
     div.append(errorConsole)
 
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 }
 export function updateTextarea(updatedText){
     document.getElementById("parse").value = updatedText
 }
 
-export function checkErrors(errors){
-    document.getElementById("errorConsole").value = ""
-    for(let i = 0; i < errors.length; i++){
-        document.getElementById("errorConsole").value += (errors[i] + "\n")
-    }
-}
-
 function parse()
 {
     var text =  document.getElementById("parse").value
-<<<<<<< Updated upstream
-    var ss = document.styleSheets[0]
-=======
->>>>>>> Stashed changes
     try {
         var entry = PARSER.parse(text);
         parseToVisual(entry)
         document.getElementById("errorConsole").value = "Parse success!!!"
-<<<<<<< Updated upstream
-        if ("insertRule" in ss) {
-            if(ss.rules.length > 0){
-                ss.deleteRule(0)
-            }
-            ss.insertRule('::selection { background: dodgerblue; color: white }', 0);
-        }
-    } catch (err) {
-            console.log(err)
-            document.getElementById("errorConsole").value = "Line " + err.location.start.line + "," + " column " + err.location.start.column + ": " + err
-            var textarea = document.getElementById("parse")
-            if ("insertRule" in ss) {
-                if(ss.rules.length > 0){
-                    ss.deleteRule(0)
-                }
-            ss.insertRule('::selection { background: red; color: black}', 0);
-            }
-            textarea.focus();
-            textarea.setSelectionRange(err.location.start.offset, err.location.end.offset);
-        }
-}
-=======
         $('#parse').highlightTextarea('destroy')
     } catch (err) {
-
             var start
             var end
             if(err.location.start.offset + findWordLength(text, err.location.start.offset) >= text.length){
@@ -130,4 +89,3 @@ function findWordLength(text, index){
     return text.substring(index).split(" ").join("\n").split("\n")[0].length
 }
 
->>>>>>> Stashed changes
