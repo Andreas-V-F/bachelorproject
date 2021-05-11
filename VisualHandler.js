@@ -1,31 +1,25 @@
-import Arrow from './Arrow.js';
 import Tool from './Tool.js';
-import Node from './Node.js';
 import { parseToSPARQL } from './VisualParser.js';
 
 var width = 1000;
 var height = 900;
+var simulation;
 var styleSheet;
-var svgElement;
-var tools = [];
-var nodes = [];
-var arrows = [];
-var posX;
-var posY;
+var svg;
 var currentTool = 0;
-var type = "SELECT";
+var tools = [];
 var selectedNodes = [];
-var selectedArrows = [];
-var prefixes = {prefixes: []
-}
+var selectedLinks = [];
+var type = "SELECT";
+var prefixes = [];
 
-
-window.onclick = function (event) {
-    let popUp = document.getElementById("popUp");
-    if (event.target == popUp) {
-        popUp.style.display = "none";
-    }
-}
+//intialize data
+var graph = {
+    nodes: [
+    ],
+    links: [
+    ]
+};
 
 export function initiate() {
 
@@ -56,10 +50,11 @@ function styleRules() {
     styleSheet.insertRule(".close { color: #aaaaaa; float: right; font-size: 28px; font-weight: bold;} ", styleSheet.cssRules.length);
     styleSheet.insertRule(".close:hover,.close:focus { color: #000; text-decoration: none; cursor: pointer} ", styleSheet.cssRules.length);
     styleSheet.insertRule(".selectedImage { border: 2px solid blue; } ", styleSheet.cssRules.length);
-    styleSheet.insertRule("#nodeText { pointer-events: none; } ", styleSheet.cssRules.length);
-    styleSheet.insertRule("#arrowText { pointer-events: none; } ", styleSheet.cssRules.length);
-    styleSheet.insertRule(".selectedNode{ stroke: red; fill: grey} ", styleSheet.cssRules.length);
-    styleSheet.insertRule(".selectedArrow{ stroke: red;} ", styleSheet.cssRules.length);
+    styleSheet.insertRule(".links line {stroke-opacity: 1;}", styleSheet.cssRules.length);
+    styleSheet.insertRule(".nodes circle {stroke: #fff;stroke-width: 1.5px;}", styleSheet.cssRules.length);
+    styleSheet.insertRule(".nodes circle {stroke: #fff;stroke-width: 1.5px;}", styleSheet.cssRules.length);
+    styleSheet.insertRule("text {-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}", styleSheet.cssRules.length);
+    styleSheet.insertRule(".nodeText {pointer-events: none; fill: white}", styleSheet.cssRules.length)
 }
 
 function initCanvas(div) {
@@ -68,13 +63,15 @@ function initCanvas(div) {
 
     initTools(toolbar);
 
-    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("height", "" + height + "");
-    svg.setAttribute("width", "" + width + "");
-    svg.setAttribute("viewBox", "0 0 " + width + " " + height + "");
-    svg.setAttribute("id", "svgCanvas");
-    div.appendChild(svg);
-    svgElement = svg;
+    //initilize svg or grab svg
+    svg = d3.select(div).append("svg")
+        .attr("height", height)
+        .attr("width", width)
+        .attr("viewBox", [0, 0, width, height])
+        .attr("cursor", "crosshair")
+        .on("click", clicked);
+
+    draw();
 }
 
 function initTools(toolbar) {
@@ -83,54 +80,13 @@ function initTools(toolbar) {
     let name = "Edit";
     img.setAttribute("title", "" + name);
     let t = new Tool(img, name, tools.length);
-    t.toDo = function (event) {
-        let element = document.elementFromPoint(event.clientX, event.clientY);
-        let str = element.id.split(":");
-        if (event.button == 0) {
-            if (element.id.includes("node")) {
-                let node = getNodeByID(str[1]);
-                if (selectedNodes.includes(node)) {
-                    deselectNode(node);
-                    return;
-                }
-                selectNode(str[1]);
-                return;
-            }
-            if (element.id.includes("arrow")) {
-                let arrow = getArrowByID(str[1]);
-                if (selectedArrows.includes(arrow)) {
-                    deselectArrow(arrow);
-                    return;
-                }
-                selectArrow(str[1]);
-            }
-        }
-    }
     tools.push(t);
-
-    /*
-    img = document.createElement("img");
-    img.src = "./resources/toolbarpics/move.png";
-    name = "Move node";
-    img.setAttribute("title", "" + name);
-    t = new Tool(img, name, tools.length);
-    t.toDo = function (event) {
-        console.log("move tool");
-    }
-    tools.push(t);*/
 
     img = document.createElement("img");
     img.src = "./resources/toolbarpics/circle.png";
     name = "Add node";
     img.setAttribute("title", "" + name);
     t = new Tool(img, name, tools.length);
-    t.toDo = function (event) {
-        if (event.button == 0) {
-            document.getElementById("popUp").style.display = "block";
-            document.getElementById("arrowDiv").style.display = "none";
-            document.getElementById("nodeDiv").style.display = "block";
-        }
-    }
     tools.push(t);
 
     img = document.createElement("img");
@@ -138,33 +94,6 @@ function initTools(toolbar) {
     name = "Connect nodes";
     img.setAttribute("title", "" + name);
     t = new Tool(img, name, tools.length);
-    t.toDo = function (event) {
-        if (event.button == 0) {
-            let element = document.elementFromPoint(event.clientX, event.clientY);
-            if (!element.id.includes("node")) {
-                return;
-            }
-
-            let str = element.id.split(":");
-            let node = getNodeByID(str[1]);
-            if (selectedNodes.includes(node)) {
-                deselectNode(node);
-                return;
-            }
-
-            if (selectedNodes.length < 2) {
-                selectNode(str[1]);
-            }
-
-            if (selectedNodes.length == 2) {
-                document.getElementById("popUp").style.display = "block";
-                document.getElementById("nodeDiv").style.display = "none";
-                document.getElementById("arrowDiv").style.display = "block";
-            }
-
-        }
-
-    }
     tools.push(t);
 
     for (let i = 0; i < tools.length; i++) {
@@ -178,6 +107,14 @@ function initTools(toolbar) {
         toolbar.appendChild(div);
     }
 
+}
+
+export function setTool(toolID) {
+    tools[currentTool].img.removeAttribute("class")
+    currentTool = toolID;
+    tools[currentTool].img.setAttribute("class", "selectedImage")
+    deselectNodes();
+    deselectLinks();
 }
 
 function createPopUp() {
@@ -225,7 +162,7 @@ function nodePopUp() {
     button.textContent = "Submit";
     button.onclick = function () {
         document.getElementById("popUp").style.display = "none";
-        nodeCreationUI(input.value, checkbox.checked);
+        addNode(input.value, checkbox.checked);
         input.value = "";
         checkbox.checked = false;
     }
@@ -249,7 +186,7 @@ function arrowPopUp() {
     button.textContent = "Submit";
     button.onclick = function () {
         document.getElementById("popUp").style.display = "none";
-        arrowCreationUI(selectedNodes[0], selectedNodes[1], input.value);
+        appendLink(selectedNodes[0], selectedNodes[1], input.value);
         input.value = "";
     }
 
@@ -263,248 +200,241 @@ function arrowPopUp() {
     return arrowDiv;
 }
 
-function nodeCreationUI(text, isBounded) {
+function draw() {
+    svg.selectAll("*").remove();
+    simulation = d3
+        .forceSimulation(graph.nodes)
+        .force(
+            "link",
+            d3
+                .forceLink()
+                .id(function (d) {
+                    return d.name;
+                }).distance(200)
+                .links(graph.links)
+        )
+        .force("boundary", forceBoundary(0, 0, width, height))
+        .force("charge", d3.forceManyBody())
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force('collide', d3.forceCollide(90))
+        .on("tick", ticked);
 
-    if (text == "") {
-        alert("Input a variablename");
-        return;
+    var link = svg.append("g")
+        .attr("class", "links")
+        .selectAll("line")
+        .data(graph.links)
+        .enter()
+        .append("line")
+        .attr("id", function (d) {
+            return "linkID" + d.index;
+        })
+        .attr("stroke-width", function (d) {
+            return 3;
+        })
+        .attr("stroke", "#999")
+        .on("click", function (d) {
+            lineClick(d);
+        });
+
+    var node = svg.append("g")
+        .attr("class", "nodes")
+        .selectAll("circle")
+        .data(graph.nodes)
+        .enter()
+        .append("circle")
+        .on("click", function (d) {
+            circleClick(d);
+        })
+        .attr("r", 25)
+        .attr("id", function (d) {
+            return "circleID" + d.index;
+        })
+        .attr("fill", function (d) {
+            return "red";
+        })
+        .call(
+            d3
+                .drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended)
+        );
+
+    var texts = svg.append("g")
+        .attr("class", "nodeText")
+        .selectAll("text")
+        .data(graph.nodes)
+        .enter()
+        .append("text").text(d => d.name)
+        .attr("text-anchor", "middle")
+
+    var linkTexts = svg.append("g")
+        .attr("class", "linkText")
+        .selectAll(".link_label")
+        .data(graph.links)
+        .enter()
+        .append("text")
+        .on("click", function (d) {
+            lineClick(d);
+        })
+        .style("text-anchor", "middle")
+        .style("dominant-baseline", "central")
+        .attr("class", "shadow")
+        .text(function (d, i) {
+            return d.value;
+        });
+
+
+    function ticked() {
+
+        texts.attr("x", d => d.x);
+        texts.attr("y", d => d.y);
+
+        link
+            .attr("x1", function (d) {
+                return d.source.x;
+            })
+            .attr("y1", function (d) {
+                return d.source.y;
+            })
+            .attr("x2", function (d) {
+                return d.target.x;
+            })
+            .attr("y2", function (d) {
+                return d.target.y;
+            });
+
+        node
+            .attr("cx", function (d) {
+                return d.x;
+            })
+            .attr("cy", function (d) {
+                return d.y;
+            });
+
+        linkTexts.attr("x", function (d, i) {
+            let p = (d.source.x + d.target.x) / 2
+            return p;
+        })
+            .attr("y", function (d) {
+                return (d.source.y + d.target.y) / 2
+            })
     }
 
-<<<<<<< Updated upstream
-    let node = new Node(text, isBounded, posX, posY);
-
-    if (text[0] != "?" && !text.includes(":")) {
-        node.variableName = "?" + text;
+    for (let i = 0; i < graph.nodes.length; i++) {
+        if (graph.nodes[i].bound) {
+            svg.select("#circleID" + i).attr("fill", "blue");
+        }
     }
+    parse();
+}
 
-    if (nodeExists(node, nodes)) {
-        alert("Variable already exists");
-        return;
-    }
-
-    nodeCreation(node);
-    nodes.push(node);
-
-=======
 function dragstarted(d) {
     if (!d3.event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
     d.fy = d.y;
->>>>>>> Stashed changes
+    console.log(graph);
 }
 
-function nodeCreation(node) {
-
-    deleteNode(node);
-
-    if (node.posX == 0 && node.posY == 0) {
-        node.posX = Math.floor(Math.random() * width);
-        node.posY = Math.floor(Math.random() * height);
-    }
-
-
-    let svg = node.drawNode();
-
-    for (let i = 0; i < svg.length; i++) {
-        let element = svg[i];
-        svgElement.appendChild(element);
-    }
-
+function dragged(d) {
+    d.fx = d3.event.x;
+    d.fy = d3.event.y;
 }
 
-function arrowCreationUI(nodeOne, nodeTwo, text) {
-    let arrow = new Arrow(nodeOne, nodeTwo, text);
-    if (arrowExists(arrow)) {
+function dragended(d) {
+    if (!d3.event.active) simulation.alphaTarget(0);
+    d.fx = null;
+    d.fy = null;
+}
+
+function clicked(event) {
+    if (currentTool == 1) {
+        document.getElementById("popUp").style.display = "block";
+        document.getElementById("arrowDiv").style.display = "none";
+        document.getElementById("nodeDiv").style.display = "block";
+    }
+}
+
+function addNode(inputName, inputBound) {
+    if (inputName == "") {
+        alert("Input a variablename");
         return;
     }
-    arrowCreation(arrow);
-    arrows.push(arrow);
-    deselectNodes();
-    springLayout();
-    updateTextualView();
-}
-
-function arrowCreation(arrow) {
-    deleteArrow(arrow);
-    let svg = arrow.drawArrow();
-    for (let i = 0; i < svg.length; i++) {
-        let element = svg[i];
-        svgElement.appendChild(element);
+    if (!inputName.includes("?") && !inputName.includes(":")) {
+        inputName = "?" + inputName
     }
-}
-
-<<<<<<< Updated upstream
-function initEventListeners() {
-    svgElement.addEventListener('mousedown', (event) => {
-        let point = svgElement.createSVGPoint();
-        point.x = event.clientX;
-        point.y = event.clientY;
-        point = point.matrixTransform(svgElement.getScreenCTM().inverse());
-        posX = point.x;
-        posY = point.y;
-        tools[currentTool].toDo(event);
-    })
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key == 'Delete') {
-            for (let i = 0; i < selectedNodes.length; i++) {
-                for (let x = 0; x < nodes.length; x++) {
-                    if (selectedNodes[i].id == nodes[x].id) {
-                        let arrowArray = getArrowsFromNode(nodes[x]);
-                        for (let y = 0; y < arrowArray.length; y++) {
-                            deleteArrow(arrowArray[y])
-                            arrows.splice(arrows.indexOf(arrowArray[y]), 1)
-                        }
-                        deleteNode(nodes[x]);
-                        nodes.splice(x, 1);
-                        break;
-                    }
-                }
-            }
-            for (let i = 0; i < selectedArrows.length; i++) {
-                for (let x = 0; x < arrows.length; x++) {
-                    if (selectedArrows[i].id == arrows[x].id) {
-                        deleteArrow(arrows[x]);
-                        arrows.splice(x, 1);
-                        break;
-                    }
-                }
-            }
-            selectedNodes = [];
-            selectedArrows = [];
-            updateTextualView();
-            springLayout();
-        }
-    })
-
-=======
-function addNode(inputName, inputBound) {
+    if (nodeExists(inputName)) {
+        alert("Variable already exists");
+        return;
+    }
     graph.nodes.push({ name: inputName, bound: inputBound })
-
+    console.log(graph);
     draw();
->>>>>>> Stashed changes
 }
 
-export function setTool(toolID) {
-    tools[currentTool].img.removeAttribute("class")
-    currentTool = toolID;
-    tools[currentTool].img.setAttribute("class", "selectedImage")
+function circleClick(node) {
+    if (currentTool == 0) {
+        edit(node)
+    }
+    if (currentTool == 2) {
+        addLink(node)
+    }
+}
+
+function lineClick(link) {
+    if (currentTool == 0) {
+        if (selectedLinks.includes(link)) {
+            deselectLink(link);
+            return;
+        }
+        selectLink(link);
+    }
+}
+
+function edit(node) {
+    if (selectedNodes.includes(node)) {
+        deselectNode(node);
+        return;
+    }
+    selectNode(node);
+}
+
+function addLink(node) {
+    if (selectedNodes.includes(node)) {
+        deselectNode(node)
+        return;
+    }
+
+    if (selectedNodes.length < 2) {
+        selectNode(node);
+    }
+
+    if (selectedNodes.length == 2) {
+        document.getElementById("popUp").style.display = "block";
+        document.getElementById("nodeDiv").style.display = "none";
+        document.getElementById("arrowDiv").style.display = "block";
+    }
+}
+
+function appendLink(node1, node2, value) {
+    graph.links.push({ source: node1.name, target: node2.name, value })
     deselectNodes();
-    deselectArrows();
+    draw();
 }
 
-export function appendParsedElements(parsedNodes, parsedArrows, ty, pref) {
-    prefixes = pref;
-    type = ty;
-
-    for (let i = 0; i < parsedNodes.length; i++) {
-        let node = nodeExists(parsedNodes[i], nodes);
-        if (node == null) {
-            nodeCreation(parsedNodes[i]);
-            nodes.push(parsedNodes[i]);
-        } else {
-            updateArrows(node, parsedArrows);
-        }
-    }
-
-    let tempArray = [];
-
-    for (let i = 0; i < nodes.length; i++) {
-        if (nodeExists(nodes[i], parsedNodes) == null) {
-            tempArray.push(nodes[i]);
-            nodes.splice(i, 1);
-            i--;
-        }
-    }
-
-    for (let i = 0; i < tempArray.length; i++) {
-        deleteNode(tempArray[i]);
-    }
-
-    for (let i = 0; i < arrows.length; i++) {
-        deleteArrow(arrows[i]);
-    }
-    arrows = [];
-
-    for (let i = 0; i < parsedArrows.length; i++) {
-        if (!arrowExists(parsedArrows[i])) {
-            arrowCreation(parsedArrows[i]);
-            arrows.push(parsedArrows[i]);
-        }
-    }
-
-    springLayout();
-
-}
-
-function nodeExists(node, nodeArray) {
-    for (let i = 0; i < nodeArray.length; i++) {
-        if (node.variableName == nodeArray[i].variableName && node.isBounded == nodeArray[i].isBounded) {
-            return nodeArray[i];
-        }
-    }
-    return null;
-}
-
-function getArrowsFromNode(node) {
-    let arrowArray = [];
-
-    for (let i = 0; i < arrows.length; i++) {
-        if (arrows[i].nodeOne.variableName == node.variableName || arrows[i].nodeTwo.variableName == node.variableName) {
-            arrowArray.push(arrows[i])
-        }
-    }
-
-    return arrowArray;
-}
-
-function deleteNode(node) {
-    for (let i = 0; i < node.svg.length; i++) {
-        svgElement.removeChild(node.svg[i]);
-    }
-}
-
-function deleteArrow(arrow) {
-    for (let i = 0; i < arrow.svg.length; i++) {
-        svgElement.removeChild(arrow.svg[i]);
-    }
-}
-
-function arrowExists(arrow) {
-    for (let i = 0; i < arrows.length; i++) {
-        if (arrow.nodeOne.variableName == arrows[i].nodeOne.variableName && arrow.nodeTwo.variableName == arrows[i].nodeTwo.variableName) {
-            return true;
-        }
-        if (arrow.nodeOne.variableName == arrows[i].nodeTwo.variableName && arrow.nodeTwo.variableName == arrows[i].nodeOne.variableName) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function updateArrows(node, ar) {
-    for (let i = 0; i < ar.length; i++) {
-        if (node.variableName == ar[i].nodeOne.variableName) {
-            ar[i].nodeOne = node;
-        } else if (node.variableName == ar[i].nodeTwo.variableName) {
-            ar[i].nodeTwo = node;
-        }
-    }
-
-}
-
-function updateTextualView() {
-    parseToSPARQL(arrows, type, prefixes);
-}
-
-function selectNode(id) {
-    let node = getNodeByID(id);
-    let circle = svgElement.getElementById("nodeCircle:" + id);
-    circle.setAttribute("class", "selectedNode");
-    circle.setAttribute("r", "6.5%");
+function selectNode(node) {
+    svg.select("#circleID" + node.index).attr("fill", "black");
     selectedNodes.push(node);
 }
 
+function deselectNode(node) {
+    if (node.bound) {
+        svg.select("#circleID" + node.index).attr("fill", "blue");
+    } else {
+        svg.select("#circleID" + node.index).attr("fill", "red");
+    }
+    selectedNodes.splice(selectedNodes.indexOf(node), 1);
+}
 
 function deselectNodes() {
     for (let i = 0; i < selectedNodes.length; i++) {
@@ -513,33 +443,76 @@ function deselectNodes() {
     }
 }
 
-function deselectNode(node) {
-    let circle = svgElement.getElementById("nodeCircle:" + node.id);
-    circle.removeAttribute("class");
-    circle.setAttribute("r", "6%")
-    selectedNodes.splice(selectedNodes.indexOf(node), 1);
+function removeNode(node) {
+    graph.nodes.splice(graph.nodes.indexOf(node), 1);
+    removeLinkFromNode(node);
 }
 
-function selectArrow(id) {
-    let arrow = getArrowByID(id);
-    let path = svgElement.getElementById("arrowPath:" + id);
-    path.setAttribute("class", "selectedArrow");
-    path.setAttribute("stroke-width", "4")
-    selectedArrows.push(arrow);
+function selectLink(link) {
+    svg.select("#linkID" + link.index).attr("stroke", "black").attr("stroke-width", "6");
+    selectedLinks.push(link);
 }
 
-
-function deselectArrow(arrow) {
-    let path = svgElement.getElementById("arrowPath:" + arrow.id);
-    path.removeAttribute("class");
-    path.setAttribute("stroke-width", "3");
-    selectedArrows.splice(selectedArrows.indexOf(arrow), 1);
+function deselectLink(link) {
+    svg.select("#linkID" + link.index).attr("stroke", "#999").attr("stroke-width", "3");
+    selectedLinks.splice(selectedLinks.indexOf(link), 1);
 }
 
+function deselectLinks() {
+    for (let i = 0; i < selectedLinks.length; i++) {
+        deselectLink(selectedLinks[i]);
+        i--;
+    }
+}
+
+function removeLink(link) {
+    graph.links.splice(graph.links.indexOf(link), 1);
+}
+
+function removeLinkFromNode(node) {
+
+    for (let i = 0; i < graph.links.length; i++) {
+        if (graph.links[i].source == node || graph.links[i].target == node) {
+            graph.links.splice(i, 1);
+            i--;
+        }
+    }
+}
+
+function initEventListeners() {
+    document.addEventListener('keydown', (event) => {
+        if (event.key == 'Delete') {
+            for (let i = 0; i < selectedNodes.length; i++) {
+                removeNode(selectedNodes[i]);
+            }
+            for (let i = 0; i < selectedLinks.length; i++) {
+                removeLink(selectedLinks[i]);
+            }
+            selectedNodes = [];
+            selectedLinks = [];
+            draw();
+        }
+    })
+}
 
 export function appendParsedElements(parsedGraph, parsedType, parsedPrefixes) {
+
     type = parsedType;
     prefixes = parsedPrefixes;
     graph = parsedGraph;
     draw();
 }
+
+function parse() {
+    parseToSPARQL(graph.links, type, prefixes)
+}
+
+function nodeExists(inputName) {
+    for(let i = 0; i < graph.nodes.length; i++){
+        if(graph.nodes[i].name == inputName){
+            return true;
+        }
+    }
+    return false;
+}
+
