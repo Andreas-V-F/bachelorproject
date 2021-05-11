@@ -158,7 +158,7 @@ peg$DefaultTracer.prototype.trace = function(event) {
       return string + repeat(" ", length - string.length);
     }
 
-    if (typeof console === "object") {
+    if (typeof console === "object" && false) {
       console.log(
         event.location.start.line + ":" + event.location.start.column + "-"
           + event.location.end.line + ":" + event.location.end.column + " "
