@@ -113,8 +113,8 @@ export function setTool(toolID) {
     tools[currentTool].img.removeAttribute("class")
     currentTool = toolID;
     tools[currentTool].img.setAttribute("class", "selectedImage")
-    //deselectNodes();
-    //deselectArrows();
+    deselectNodes();
+    deselectLinks();
 }
 
 function createPopUp() {
@@ -162,9 +162,6 @@ function nodePopUp() {
     button.textContent = "Submit";
     button.onclick = function () {
         document.getElementById("popUp").style.display = "none";
-        if(!input.value.includes("?")){
-            input.value = "?" + input.value
-        }
         addNode(input.value, checkbox.checked);
         input.value = "";
         checkbox.checked = false;
@@ -359,6 +356,17 @@ function clicked(event) {
 }
 
 function addNode(inputName, inputBound) {
+    if (inputName == "") {
+        alert("Input a variablename");
+        return;
+    }
+    if (!inputName.includes("?") && !inputName.includes(":")) {
+        inputName = "?" + inputName
+    }
+    if (nodeExists(inputName)) {
+        alert("Variable already exists");
+        return;
+    }
     graph.nodes.push({ name: inputName, bound: inputBound })
     console.log(graph);
     draw();
@@ -420,7 +428,11 @@ function selectNode(node) {
 }
 
 function deselectNode(node) {
-    svg.select("#circleID" + node.index).attr("fill", "red");
+    if (node.bound) {
+        svg.select("#circleID" + node.index).attr("fill", "blue");
+    } else {
+        svg.select("#circleID" + node.index).attr("fill", "red");
+    }
     selectedNodes.splice(selectedNodes.indexOf(node), 1);
 }
 
@@ -444,6 +456,13 @@ function selectLink(link) {
 function deselectLink(link) {
     svg.select("#linkID" + link.index).attr("stroke", "#999").attr("stroke-width", "3");
     selectedLinks.splice(selectedLinks.indexOf(link), 1);
+}
+
+function deselectLinks() {
+    for (let i = 0; i < selectedLinks.length; i++) {
+        deselectLink(selectedLinks[i]);
+        i--;
+    }
 }
 
 function removeLink(link) {
@@ -486,5 +505,14 @@ export function appendParsedElements(parsedGraph, parsedType, parsedPrefixes) {
 
 function parse() {
     parseToSPARQL(graph.links, type, prefixes)
+}
+
+function nodeExists(inputName) {
+    for(let i = 0; i < graph.nodes.length; i++){
+        if(graph.nodes[i].name == inputName){
+            return true;
+        }
+    }
+    return false;
 }
 
