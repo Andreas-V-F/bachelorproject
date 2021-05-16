@@ -21,6 +21,10 @@ var graph = {
     ]
 };
 
+var toolsEnums = {
+    tools: []
+}
+
 export function initiate() {
 
     styleRules();
@@ -77,10 +81,11 @@ function initCanvas(div) {
 function initTools(toolbar) {
     let img = document.createElement("img");
     img.src = "./resources/toolbarpics/mouse_pointer.png";
-    let name = "Edit";
+    let name = "Select";
     img.setAttribute("title", "" + name);
     let t = new Tool(img, name, tools.length);
     tools.push(t);
+    toolsEnums.tools.push({name: name, id: t.id})
 
     img = document.createElement("img");
     img.src = "./resources/toolbarpics/circle.png";
@@ -88,6 +93,7 @@ function initTools(toolbar) {
     img.setAttribute("title", "" + name);
     t = new Tool(img, name, tools.length);
     tools.push(t);
+    toolsEnums.tools.push({name: name, id: t.id})
 
     img = document.createElement("img");
     img.src = "./resources/toolbarpics/arrow.png";
@@ -95,6 +101,15 @@ function initTools(toolbar) {
     img.setAttribute("title", "" + name);
     t = new Tool(img, name, tools.length);
     tools.push(t);
+    toolsEnums.tools.push({name: name, id: t.id})
+
+    img = document.createElement("img");
+    img.src = "./resources/toolbarpics/edit.png";
+    name = "Edit";
+    img.setAttribute("title", "" + name);
+    t = new Tool(img, name, tools.length);
+    tools.push(t);
+    toolsEnums.tools.push({name: name, id: t.id})
 
     for (let i = 0; i < tools.length; i++) {
         let image = tools[i].img;
@@ -130,6 +145,9 @@ function createPopUp() {
     close.textContent = "×"
     close.onclick = function () {
         document.getElementById("popUp").style.display = "none";
+        document.getElementById("inputNode").value = ""
+        deselectNodes()
+        deselectLinks()
     }
 
     innerDiv.appendChild(close);
@@ -154,8 +172,11 @@ function nodePopUp() {
     let checkbox = document.createElement("input");
     let button = document.createElement("button");
 
+
     formDiv.setAttribute("id", "nodeDiv");
     input.setAttribute("type", "text");
+    input.setAttribute("id", "inputNode")
+    checkbox.setAttribute("id", "checkboxNode")
     title.textContent = "Variable name:";
     p.textContent = "Bounded:";
     checkbox.setAttribute("type", "checkbox");
@@ -182,6 +203,7 @@ function arrowPopUp() {
     let input = document.createElement("input");
     let p = document.createElement("p");
     let button = document.createElement("button");
+    input.setAttribute("id", "inputLink")
 
     button.textContent = "Submit";
     button.onclick = function () {
@@ -199,6 +221,7 @@ function arrowPopUp() {
     arrowDiv.appendChild(button);
     return arrowDiv;
 }
+
 
 function draw() {
     svg.selectAll("*").remove();
@@ -348,7 +371,7 @@ function dragended(d) {
 }
 
 function clicked(event) {
-    if (currentTool == 1) {
+    if (currentTool == getToolID("Add node")) {
         document.getElementById("popUp").style.display = "block";
         document.getElementById("arrowDiv").style.display = "none";
         document.getElementById("nodeDiv").style.display = "block";
@@ -356,6 +379,8 @@ function clicked(event) {
 }
 
 function addNode(inputName, inputBound) {
+    let node = selectedNodes[0]
+    deselectNodes()
     if (inputName == "") {
         alert("Input a variablename");
         return;
@@ -363,41 +388,57 @@ function addNode(inputName, inputBound) {
     if (!inputName.includes("?") && !inputName.includes(":")) {
         inputName = "?" + inputName
     }
-    if (nodeExists(inputName)) {
+    if (nodeExists(inputName) && node.name != inputName) {
         alert("Variable already exists");
         return;
     }
     graph.nodes.push({ name: inputName, bound: inputBound })
-    console.log(graph);
+    if(currentTool == getToolID("Edit")){
+        let newNode = getNode(inputName)
+        let temp = getLinksFromNode(node)
+        for(let i = 0; i < temp.length; i++){
+            if(temp[i].source == node){
+                appendLink(newNode, temp[i].target, temp[i].value)
+            } else{
+                appendLink(temp[i].source, newNode, temp[i].value)
+            }
+        }
+        removeNode(node)
+    }
     draw();
 }
 
 function circleClick(node) {
-    if (currentTool == 0) {
-        edit(node)
+    if (currentTool == getToolID("Select")) {
+        if (selectedNodes.includes(node)) {
+            deselectNode(node);
+            return;
+        }
+        selectNode(node);
     }
-    if (currentTool == 2) {
+    if (currentTool == getToolID("Connect nodes")) {
         addLink(node)
+    }
+
+    if (currentTool == getToolID("Edit")){
+        editNode(node)
     }
 }
 
 function lineClick(link) {
-    if (currentTool == 0) {
+    if (currentTool == getToolID("Select")) {
         if (selectedLinks.includes(link)) {
             deselectLink(link);
             return;
         }
         selectLink(link);
     }
+
+    if (currentTool == getToolID("Edit")){
+        editLink(link)
+    }
 }
 
-function edit(node) {
-    if (selectedNodes.includes(node)) {
-        deselectNode(node);
-        return;
-    }
-    selectNode(node);
-}
 
 function addLink(node) {
     if (selectedNodes.includes(node)) {
@@ -417,8 +458,16 @@ function addLink(node) {
 }
 
 function appendLink(node1, node2, value) {
+
     graph.links.push({ source: node1.name, target: node2.name, value })
+
     deselectNodes();
+    if(currentTool == getToolID("Edit") && selectedLinks.length > 0){
+        console.log(selectedLinks.length)
+        let link = selectedLinks[0]
+        removeLink(link)
+    }
+    deselectLinks()
     draw();
 }
 
@@ -446,8 +495,30 @@ function deselectNodes() {
 function removeNode(node) {
     graph.nodes.splice(graph.nodes.indexOf(node), 1);
     removeLinkFromNode(node);
+    draw()
 }
 
+function editNode(node) {
+    selectNode(node)
+    document.getElementById("popUp").style.display = "block";
+    document.getElementById("arrowDiv").style.display = "none";
+    document.getElementById("nodeDiv").style.display = "block";
+    document.getElementById("inputNode").value = node.name
+    document.getElementById("checkboxNode").checked = node.bound
+
+
+
+}
+
+function getLinksFromNode(node){
+    let returnArray = []
+    for(let i = 0; i < graph.links.length; i++){
+         if(graph.links[i].source == node || graph.links[i].target == node){
+             returnArray.push(graph.links[i])
+         }
+    }
+    return returnArray
+}
 function selectLink(link) {
     svg.select("#linkID" + link.index).attr("stroke", "black").attr("stroke-width", "6");
     selectedLinks.push(link);
@@ -467,7 +538,9 @@ function deselectLinks() {
 
 function removeLink(link) {
     graph.links.splice(graph.links.indexOf(link), 1);
+    draw()
 }
+
 
 function removeLinkFromNode(node) {
 
@@ -477,6 +550,16 @@ function removeLinkFromNode(node) {
             i--;
         }
     }
+}
+
+function editLink(link){
+    selectLink(link)
+    selectNode(link.source)
+    selectNode(link.target)
+    document.getElementById("popUp").style.display = "block";
+    document.getElementById("arrowDiv").style.display = "block";
+    document.getElementById("nodeDiv").style.display = "none";
+    document.getElementById("inputLink").value = link.value
 }
 
 function initEventListeners() {
@@ -515,4 +598,24 @@ function nodeExists(inputName) {
     }
     return false;
 }
+
+function getNode(inputName) {
+    for(let i = 0; i < graph.nodes.length; i++){
+        if(graph.nodes[i].name == inputName){
+            return graph.nodes[i]
+        }
+    }
+    return null
+}
+
+
+function getToolID(name){
+    for(let i = 0; i < toolsEnums.tools.length; i++){
+        if(toolsEnums.tools[i].name == name){
+            return toolsEnums.tools[i].id
+        }
+    }
+    return null
+}
+
 
