@@ -1,8 +1,8 @@
 import Tool from './Tool.js';
 import { parseToSPARQL } from './VisualParser.js';
 
-var width = 1000;
-var height = 900;
+var width = 800;
+var height = 700;
 var simulation;
 var styleSheet;
 var svg;
@@ -47,7 +47,7 @@ function styleRules() {
     styleSheet = styleElement.sheet;
     styleSheet.insertRule("svg { background-color: #F3F0F0; display: block; margin: auto } ", styleSheet.cssRules.length);
     styleSheet.insertRule("img { border: 1px solid #ddd; border-radius: 4px; } ", styleSheet.cssRules.length);
-    styleSheet.insertRule("div { text-align:center; -ms-user-select: none; -moz-user-select: none; -webkit-user-select: none; user-select: none } ", styleSheet.cssRules.length);
+    styleSheet.insertRule("div { text-align:center; -ms-user-select: none; -moz-user-select: none; -webkit-user-select: none; user-select: none; } ", styleSheet.cssRules.length);
     styleSheet.insertRule(".image { display: inline-block } ", styleSheet.cssRules.length);
     styleSheet.insertRule(".form { display: none; position: fixed; z-index: 1; padding-top: 100px; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0); background-color: rgba(0,0,0,0.4) } ", styleSheet.cssRules.length);
     styleSheet.insertRule(".formcontent { background-color: #fefefe; margin: auto; padding: 20px; border: 1px solid #888; width: 20% } ", styleSheet.cssRules.length);
@@ -75,7 +75,36 @@ function initCanvas(div) {
         .attr("cursor", "crosshair")
         .on("click", clicked);
 
+    div = document.createElement("div");
+    document.body.append(div);
+
+
+    let button = document.createElement("button");
+    button.textContent = "Download";
+    button.onclick = function () {
+        let jsonData = JSON.stringify(graph);
+        download(jsonData, 'json.txt', 'text/plain');
+    }
+    div.appendChild(button);
+
+    button = document.createElement("button");
+    button.textContent = "Load JSON";
+    button.onclick = function () {
+        loadFile()
+    }
+    div.appendChild(button);
+
+    let inputFile = document.createElement("input");
+    inputFile.setAttribute("type","file");
+    inputFile.setAttribute("id","fileinput");
+    div.appendChild(inputFile);
+
+    div.style.float = "right"
+    div.style.marginRight = "400px"
+    div.style.marginTop = "5px"
+
     draw();
+
 }
 
 function initTools(toolbar) {
@@ -85,7 +114,7 @@ function initTools(toolbar) {
     img.setAttribute("title", "" + name);
     let t = new Tool(img, name, tools.length);
     tools.push(t);
-    toolsEnums.tools.push({name: name, id: t.id})
+    toolsEnums.tools.push({ name: name, id: t.id })
 
     img = document.createElement("img");
     img.src = "./resources/toolbarpics/circle.png";
@@ -93,7 +122,7 @@ function initTools(toolbar) {
     img.setAttribute("title", "" + name);
     t = new Tool(img, name, tools.length);
     tools.push(t);
-    toolsEnums.tools.push({name: name, id: t.id})
+    toolsEnums.tools.push({ name: name, id: t.id })
 
     img = document.createElement("img");
     img.src = "./resources/toolbarpics/arrow.png";
@@ -101,7 +130,7 @@ function initTools(toolbar) {
     img.setAttribute("title", "" + name);
     t = new Tool(img, name, tools.length);
     tools.push(t);
-    toolsEnums.tools.push({name: name, id: t.id})
+    toolsEnums.tools.push({ name: name, id: t.id })
 
     img = document.createElement("img");
     img.src = "./resources/toolbarpics/edit.png";
@@ -109,7 +138,7 @@ function initTools(toolbar) {
     img.setAttribute("title", "" + name);
     t = new Tool(img, name, tools.length);
     tools.push(t);
-    toolsEnums.tools.push({name: name, id: t.id})
+    toolsEnums.tools.push({ name: name, id: t.id })
 
     for (let i = 0; i < tools.length; i++) {
         let image = tools[i].img;
@@ -388,18 +417,27 @@ function addNode(inputName, inputBound) {
     if (!inputName.includes("?") && !inputName.includes(":")) {
         inputName = "?" + inputName
     }
-    if (nodeExists(inputName) && node.name != inputName) {
-        alert("Variable already exists");
-        return;
+    if (node != null) {
+        if (nodeExists(inputName) && node.name != inputName) {
+            alert("Variable already exists");
+            return;
+        }
+    } else {
+        if (nodeExists(inputName)) {
+            alert("Variable already exists");
+            return;
+        }
     }
+
     graph.nodes.push({ name: inputName, bound: inputBound })
-    if(currentTool == getToolID("Edit")){
+
+    if (currentTool == getToolID("Edit")) {
         let newNode = getNode(inputName)
         let temp = getLinksFromNode(node)
-        for(let i = 0; i < temp.length; i++){
-            if(temp[i].source == node){
+        for (let i = 0; i < temp.length; i++) {
+            if (temp[i].source == node) {
                 appendLink(newNode, temp[i].target, temp[i].value)
-            } else{
+            } else {
                 appendLink(temp[i].source, newNode, temp[i].value)
             }
         }
@@ -420,7 +458,7 @@ function circleClick(node) {
         addLink(node)
     }
 
-    if (currentTool == getToolID("Edit")){
+    if (currentTool == getToolID("Edit")) {
         editNode(node)
     }
 }
@@ -434,7 +472,7 @@ function lineClick(link) {
         selectLink(link);
     }
 
-    if (currentTool == getToolID("Edit")){
+    if (currentTool == getToolID("Edit")) {
         editLink(link)
     }
 }
@@ -462,7 +500,7 @@ function appendLink(node1, node2, value) {
     graph.links.push({ source: node1.name, target: node2.name, value })
 
     deselectNodes();
-    if(currentTool == getToolID("Edit") && selectedLinks.length > 0){
+    if (currentTool == getToolID("Edit") && selectedLinks.length > 0) {
         console.log(selectedLinks.length)
         let link = selectedLinks[0]
         removeLink(link)
@@ -510,12 +548,12 @@ function editNode(node) {
 
 }
 
-function getLinksFromNode(node){
+function getLinksFromNode(node) {
     let returnArray = []
-    for(let i = 0; i < graph.links.length; i++){
-         if(graph.links[i].source == node || graph.links[i].target == node){
-             returnArray.push(graph.links[i])
-         }
+    for (let i = 0; i < graph.links.length; i++) {
+        if (graph.links[i].source == node || graph.links[i].target == node) {
+            returnArray.push(graph.links[i])
+        }
     }
     return returnArray
 }
@@ -552,7 +590,7 @@ function removeLinkFromNode(node) {
     }
 }
 
-function editLink(link){
+function editLink(link) {
     selectLink(link)
     selectNode(link.source)
     selectNode(link.target)
@@ -591,8 +629,8 @@ function parse() {
 }
 
 function nodeExists(inputName) {
-    for(let i = 0; i < graph.nodes.length; i++){
-        if(graph.nodes[i].name == inputName){
+    for (let i = 0; i < graph.nodes.length; i++) {
+        if (graph.nodes[i].name == inputName) {
             return true;
         }
     }
@@ -600,8 +638,8 @@ function nodeExists(inputName) {
 }
 
 function getNode(inputName) {
-    for(let i = 0; i < graph.nodes.length; i++){
-        if(graph.nodes[i].name == inputName){
+    for (let i = 0; i < graph.nodes.length; i++) {
+        if (graph.nodes[i].name == inputName) {
             return graph.nodes[i]
         }
     }
@@ -609,13 +647,67 @@ function getNode(inputName) {
 }
 
 
-function getToolID(name){
-    for(let i = 0; i < toolsEnums.tools.length; i++){
-        if(toolsEnums.tools[i].name == name){
+function getToolID(name) {
+    for (let i = 0; i < toolsEnums.tools.length; i++) {
+        if (toolsEnums.tools[i].name == name) {
             return toolsEnums.tools[i].id
         }
     }
     return null
 }
 
+function download(content, fileName, contentType) {
+    var a = document.createElement("a");
+    var file = new Blob([content], { type: contentType });
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+}
 
+function loadFile() {
+    var input, file, fr;
+
+    if (typeof window.FileReader !== 'function') {
+        alert("The file API isn't supported on this browser yet.");
+        return;
+    }
+
+    input = document.getElementById('fileinput');
+    if (!input) {
+        alert("Um, couldn't find the fileinput element.");
+    }
+    else if (!input.files) {
+        alert("This browser doesn't seem to support the files property of file inputs.");
+    }
+    else if (!input.files[0]) {
+        alert("Please select a file before clicking 'Load'");
+    }
+    else {
+        file = input.files[0];
+        fr = new FileReader();
+        fr.onload = receivedText;
+        fr.readAsText(file);
+    }
+
+    function receivedText(e) {
+        let lines = e.target.result;
+        var newArr = JSON.parse(lines);
+        graph = {
+            nodes: [
+            ],
+            links: [
+            ]
+        };
+
+        for(let i = 0; i<newArr.nodes.length; i++){
+            graph.nodes.push({name: newArr.nodes[i].name, bound: newArr.nodes[i].bound });
+        }
+
+        for(let i = 0; i<newArr.links.length; i++){
+            graph.links.push({ source: newArr.links[i].source.name, target: newArr.links[i].target.name, value: newArr.links[i].value })
+        }
+
+        
+        draw();
+    }
+}
