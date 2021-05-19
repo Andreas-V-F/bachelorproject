@@ -2,7 +2,6 @@ import Tool from './Tool.js';
 import { parseToSPARQL } from './VisualParser.js';
 import * as d3 from "https://unpkg.com/d3@5?module";
 import forceBoundary from "https://unpkg.com/d3-force-boundary@0.0.1?module";
-import edit from "https://cdn.jsdelivr.net/gh/Andreas-V-F/bachelorproject/resources/toolbarpics/arrow.png"
 
 
 var width = 800;
@@ -113,7 +112,7 @@ function initCanvas(div) {
 
 function initTools(toolbar) {
     let img = document.createElement("img");
-    img.src = "./resources/toolbarpics/mouse_pointer.png";
+    img.src = "https://cdn.jsdelivr.net/gh/Andreas-V-F/bachelorproject/resources/toolbarpics/mouse_pointer.png";
     let name = "Select";
     img.setAttribute("title", "" + name);
     let t = new Tool(img, name, tools.length);
@@ -121,7 +120,7 @@ function initTools(toolbar) {
     toolsEnums.tools.push({ name: name, id: t.id })
 
     img = document.createElement("img");
-    img.src = "./resources/toolbarpics/circle.png";
+    img.src = "https://cdn.jsdelivr.net/gh/Andreas-V-F/bachelorproject/resources/toolbarpics/circle.png";
     name = "Add node";
     img.setAttribute("title", "" + name);
     t = new Tool(img, name, tools.length);
@@ -129,7 +128,7 @@ function initTools(toolbar) {
     toolsEnums.tools.push({ name: name, id: t.id })
 
     img = document.createElement("img");
-    img.src = "./resources/toolbarpics/arrow.png";
+    img.src = "https://cdn.jsdelivr.net/gh/Andreas-V-F/bachelorproject/resources/toolbarpics/arrow.png";
     name = "Connect nodes";
     img.setAttribute("title", "" + name);
     t = new Tool(img, name, tools.length);
@@ -137,7 +136,7 @@ function initTools(toolbar) {
     toolsEnums.tools.push({ name: name, id: t.id })
 
     img = document.createElement("img");
-    img.src = edit;
+    img.src = "https://cdn.jsdelivr.net/gh/Andreas-V-F/bachelorproject/resources/toolbarpics/edit.png";
     name = "Edit";
     img.setAttribute("title", "" + name);
     t = new Tool(img, name, tools.length);
