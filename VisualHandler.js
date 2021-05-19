@@ -2,6 +2,7 @@ import Tool from './Tool.js';
 import { parseToSPARQL } from './VisualParser.js';
 import * as d3 from "https://unpkg.com/d3@5?module";
 import forceBoundary from "https://unpkg.com/d3-force-boundary@0.0.1?module";
+import edit from "./resources/toolbarpics/edit.png";
 
 var width = 800;
 var height = 700;
@@ -135,7 +136,7 @@ function initTools(toolbar) {
     toolsEnums.tools.push({ name: name, id: t.id })
 
     img = document.createElement("img");
-    img.src = "./resources/toolbarpics/edit.png";
+    img.src = edit;
     name = "Edit";
     img.setAttribute("title", "" + name);
     t = new Tool(img, name, tools.length);
