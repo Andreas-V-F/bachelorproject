@@ -1,8 +1,6 @@
 import "./grammar.js"
 import {parseToVisual} from "./VisualParser.js";
 
-
-
 let height = "200px"
 let width = "400px"
 

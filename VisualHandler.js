@@ -1,5 +1,7 @@
 import Tool from './Tool.js';
 import { parseToSPARQL } from './VisualParser.js';
+import * as d3 from "https://unpkg.com/d3@5?module";
+import forceBoundary from "https://unpkg.com/d3-force-boundary@0.0.1?module";
 
 var width = 800;
 var height = 700;
