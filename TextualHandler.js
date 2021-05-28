@@ -1,5 +1,6 @@
 import "./grammar.js"
 import {parseToVisual} from "./VisualParser.js";
+import {parseToSPARQL} from "./TextParser.js";
 
 let height = "200px"
 let width = "400px"
@@ -18,12 +19,12 @@ export function initiateTextualHandler() {
     parseText.style.width = width
     parseText.spellcheck = false
     parseText.onchange = function () {
-        parse()
+        printSPARQL()
     }
     let parseButton = document.createElement("button")
     parseButton.textContent = "Run"
     parseButton.onclick = function () {
-        parse()
+        printSPARQL()
     }
 
     let errorConsole = document.createElement("textarea")
@@ -42,14 +43,15 @@ export function initiateTextualHandler() {
 }
 
 export function updateTextarea(updatedText) {
+
     document.getElementById("parse").value = updatedText
 }
 
-function parse() {
+function printSPARQL() {
     let text = document.getElementById("parse").value;
     try {
-        let entry = PARSER.parse(text);
-        parseToVisual(entry)
+        let SPARQL = parseToSPARQL(text)
+        parseToVisual(SPARQL)
         document.getElementById("errorConsole").value = "Parse success!!!"
         $('#parse').highlightTextarea('destroy')
     } catch (err) {
@@ -80,7 +82,6 @@ function parse() {
 }
 
 function findWordLength(text, index) {
-
     return text.substring(index).split(" ").join("\n").split("\n")[0].length
 }
 

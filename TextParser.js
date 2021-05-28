@@ -1,5 +1,8 @@
 import {updateTextarea} from "./TextualHandler.js";
 
+export function parseToSPARQL(text){
+    return PARSER.parse(text)
+}
 export function returnToText(sparql) {
 
     let outputText = ""

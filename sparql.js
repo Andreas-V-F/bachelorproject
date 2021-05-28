@@ -15,7 +15,7 @@ export default class SPARQL {
 
 
     constructor(triples, type, boundVariables, prefixes) {
-        this.triples = triples
+        this.setTriples(triples)
         this.type = type
         this.boundVariables = boundVariables
         this.listOfPrefixes = prefixes;
@@ -41,6 +41,26 @@ export default class SPARQL {
     setLiterals(value) {
         if (value.includes("\"") && !this.literals.includes(value)) {
             this.literals.push(value)
+        }
+    }
+
+    setTriples(triples){
+
+        for(let i = 0; i < triples.length; i++){
+            if(this.triples.length === 0){
+                this.triples.push(triples[i])
+                continue
+            }
+            for(let j = 0; j < this.triples.length; j++){
+                console.log((this.triples[j].subject === triples[i].subject && this.triples[j].object === triples[i].object))
+                console.log((this.triples[j].subject === triples[i].object && this.triples[j].object === triples[i].subject))
+                if(!(this.triples[j].subject === triples[i].subject && this.triples[j].object === triples[i].object)
+                && !(this.triples[j].subject === triples[i].object && this.triples[j].object === triples[i].subject)){
+                    this.triples.push(triples[i])
+                    break
+                }
+            }
+
         }
     }
 

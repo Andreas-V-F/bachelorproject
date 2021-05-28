@@ -6,7 +6,6 @@ window.PARSER = /*
  * http://pegjs.org/
  */
     (function() {
-
 "use strict";
 
 function peg$subclass(child, parent) {
@@ -158,13 +157,8 @@ peg$DefaultTracer.prototype.trace = function(event) {
       return string + repeat(" ", length - string.length);
     }
 
-    if (typeof console === "object" && false) {
-      console.log(
-        event.location.start.line + ":" + event.location.start.column + "-"
-          + event.location.end.line + ":" + event.location.end.column + " "
-          + pad(event.type, 10) + " "
-          + repeat("  ", that.indentLevel) + event.rule
-      );
+    if (typeof console === "object") {
+
     }
   }
 
@@ -408,13 +402,9 @@ function peg$parse(input, options) {
       if (s2 !== peg$FAILED) {
         s3 = [];
         s4 = peg$parseboundvarible();
-        if (s4 !== peg$FAILED) {
-          while (s4 !== peg$FAILED) {
-            s3.push(s4);
-            s4 = peg$parseboundvarible();
-          }
-        } else {
-          s3 = peg$FAILED;
+        while (s4 !== peg$FAILED) {
+          s3.push(s4);
+          s4 = peg$parseboundvarible();
         }
         if (s3 !== peg$FAILED) {
           s4 = peg$parsewhere();
@@ -1473,9 +1463,9 @@ function peg$parse(input, options) {
   }
 }
 
-return {
-    SyntaxError: peg$SyntaxError,
-    DefaultTracer: peg$DefaultTracer,
-    parse:       peg$parse
-};
-})();
+      return {
+        SyntaxError: peg$SyntaxError,
+        DefaultTracer: peg$DefaultTracer,
+        parse:       peg$parse
+      };
+    })();

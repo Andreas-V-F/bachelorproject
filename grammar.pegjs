@@ -1,5 +1,5 @@
 Type
-  = prefixes:prefix* t:"SELECT" bv:boundvarible+ where lbracket trip:triples+ rbracket { return new SPARQL(trip, t, bv, prefixes); }
+  = prefixes:prefix* t:"SELECT" bv:boundvarible* where lbracket trip:triples+ rbracket { return new SPARQL(trip, t, bv, prefixes); }
 
 prefix = "PREFIX" space prefix:word space* "<"? link:link ">"? lineBreak {
 var linkClean = link.replace(/,/g, "")
