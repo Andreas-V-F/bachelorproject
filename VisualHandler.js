@@ -388,7 +388,6 @@ function dragstarted(d) {
     if (!d3.event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
     d.fy = d.y;
-    console.log(graph);
 }
 
 function dragged(d) {
@@ -504,7 +503,6 @@ function appendLink(node1, node2, value) {
 
     deselectNodes();
     if (currentTool == getToolID("Edit") && selectedLinks.length > 0) {
-        console.log(selectedLinks.length)
         let link = selectedLinks[0]
         removeLink(link)
     }

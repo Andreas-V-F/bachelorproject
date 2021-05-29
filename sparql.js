@@ -52,8 +52,6 @@ export default class SPARQL {
                 continue
             }
             for(let j = 0; j < this.triples.length; j++){
-                console.log((this.triples[j].subject === triples[i].subject && this.triples[j].object === triples[i].object))
-                console.log((this.triples[j].subject === triples[i].object && this.triples[j].object === triples[i].subject))
                 if(!(this.triples[j].subject === triples[i].subject && this.triples[j].object === triples[i].object)
                 && !(this.triples[j].subject === triples[i].object && this.triples[j].object === triples[i].subject)){
                     this.triples.push(triples[i])

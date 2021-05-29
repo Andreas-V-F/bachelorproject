@@ -1,10 +1,11 @@
 import "./grammar.js"
 import {parseToVisual} from "./VisualParser.js";
 import {parseToSPARQL} from "./TextParser.js";
+import {overLoadTextualParser} from "./test.js";
 
 let height = "200px"
 let width = "400px"
-
+let time = []
 export function initiateTextualHandler() {
     let div = document.createElement("div")
     div.style.float = "left"
@@ -19,12 +20,24 @@ export function initiateTextualHandler() {
     parseText.style.width = width
     parseText.spellcheck = false
     parseText.onchange = function () {
-        printSPARQL()
+        let text = document.getElementById("parse").value;
+
+        printSPARQL(text)
     }
     let parseButton = document.createElement("button")
     parseButton.textContent = "Run"
     parseButton.onclick = function () {
-        printSPARQL()
+        let text = document.getElementById("parse").value;
+        for(let i = 0; i < 100; i++){
+            var dt = new Date()
+            var startTime = dt.getTime()
+            overLoadTextualParser()
+            var enddt = new Date()
+            var endTime = enddt.getTime()
+            time.push(endTime-startTime)
+        }
+        console.log(time)
+
     }
 
     let errorConsole = document.createElement("textarea")
@@ -47,8 +60,8 @@ export function updateTextarea(updatedText) {
     document.getElementById("parse").value = updatedText
 }
 
-function printSPARQL() {
-    let text = document.getElementById("parse").value;
+export function printSPARQL(text) {
+
     try {
         let SPARQL = parseToSPARQL(text)
         parseToVisual(SPARQL)
