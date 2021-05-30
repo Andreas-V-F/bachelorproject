@@ -1,4 +1,4 @@
-import {checkErrors, updateTextarea} from "./TextualHandler.js";
+import {printErrors, updateTextarea} from "./TextualHandler.js";
 import SPARQL from "./sparql.js";
 import Triple from "./Triple.js";
 import { parseToVisual } from "./VisualParser.js"
@@ -6,15 +6,15 @@ import { parseToVisual } from "./VisualParser.js"
 let indexOf = (arr, q) => arr.findIndex(item => q.toLowerCase() === item.toLowerCase());
 
 
-export function parse() {
+export function parse(text) {
     let parsePrefixes = []
     let parseTriples = []
     let parseType = ""
     let parseBoundVariables = []
     let errors = []
 
-    let s = document.getElementById("parse").value;
-    let t = s.split(" ").join("\n").split("\n")
+
+    let t = text.split(" ").join("\n").split("\n")
     t = arrayRemove(t, "")
     t = t.map(function (el) {
         return el.trim();
@@ -68,7 +68,7 @@ export function parse() {
     if(errors.length === 0){
         parseToVisual(new SPARQL(parseTriples, parseType, parseBoundVariables, parsePrefixes))
     }
-    checkErrors(errors)
+    printErrors(errors)
 }
 
 function arrayRemove(arr, value) {

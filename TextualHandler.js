@@ -20,7 +20,7 @@ export function initiateTextualHandler(){
     let parseButton = document.createElement("button")
     parseButton.textContent = "Parse"
     parseButton.onclick = function(){
-        parse()
+        parse(document.getElementById("parse").value)
     }
     let errorConsole = document.createElement("textarea")
     errorConsole.setAttribute("id", "errorConsole")
@@ -32,14 +32,13 @@ export function initiateTextualHandler(){
     div.append(parseButton)
     div.append(document.createElement("br"))
     div.append(errorConsole)
-
-
 }
+
 export function updateTextarea(updatedText){
     document.getElementById("parse").value = updatedText
 }
 
-export function checkErrors(errors){
+export function printErrors(errors){
     document.getElementById("errorConsole").value = ""
     for(let i = 0; i < errors.length; i++){
         document.getElementById("errorConsole").value += (errors[i] + "\n")
